@@ -4,12 +4,13 @@
   "main": "puppeteer.js",
   "type": "module",
   "scripts": {
-    "puppeteer": "node --experimental-modules --no-warnings ./test/puppeteer.js",
-    "ci": "CI=true concurrently -k -s first \"npm:puppeteer\" \"npm:server\"",
-    "server": "http-server -c-1 -p 8080"
+    "test": "node -r esm ./test/puppeteer.js",
+    "ci": "CI=true concurrently -k -s first \"npm:test\" \"npm:server\"",
+    "http": "http-server -c-1 -p 8080"
   },
   "devDependencies": {
     "concurrently": "^5.0.0",
+    "esm": "^3.2.25",
     "http-server": "^0.11.1",
     "puppeteer": "^2.0.0"
   },
