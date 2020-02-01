@@ -3,7 +3,6 @@ import puppeteer from 'puppeteer';
 
 (async () => {
   puppeteer.launch({
-    headless: !process.env.CI,
     args: ['--use-gl=egl']
   }).then(async browser => {
     const main = (await browser.pages())[0];

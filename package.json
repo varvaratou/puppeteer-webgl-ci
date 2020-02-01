@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node -r esm ./test/puppeteer.js",
-    "ci": "CI=true concurrently -k -s first \"npm:test\" \"npm:server\"",
+    "ci": "concurrently -k -s first \"npm:test\" \"npm:http\"",
     "http": "http-server -c-1 -p 8080"
   },
   "devDependencies": {
