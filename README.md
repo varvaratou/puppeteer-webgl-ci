@@ -5,8 +5,10 @@
 This repo created in order to add WebGL automated testing with puppeteer in Three.js.
 
 ### 2do list
-- [x] screenshots maker
+- [x] screenshot maker
 - [x] ci config for travis/circleci
-- [x] prototype for exact time
+- [x] deterministic time for screenshot
+- [x] procedure that recalculate all examples
+- [ ] deterministic random for screenshot
 - [ ] diff between two images
 - [ ] parallel testing in target folder

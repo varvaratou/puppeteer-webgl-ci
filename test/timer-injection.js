@@ -2,7 +2,7 @@
 if (navigator.webdriver) {
 
   // timer definition
-  let TIMESTART = 5000;
+  let TIMESTART = 0;
   let TIMECOUNT = 0;
   const TIMEGETTER = function() {
     TIMECOUNT++;
@@ -11,17 +11,18 @@ if (navigator.webdriver) {
 
   // time calculated as Date.now()
   window.Date.now = TIMEGETTER;
-
-  // time calculated as performance.now()
-  window.performance.now = TIMEGETTER;
+  window.Date.prototype.now = TIMEGETTER;
 
   // time calculated as ( new Date() ).getTime()
   window.Date.prototype.getTime = TIMEGETTER;
 
+  // time calculated as performance.now()
+  window.performance.now = TIMEGETTER;
+
   // time calculated in requstAnimationFrame() callback
   const RAF = window.requestAnimationFrame;
   window.requestAnimationFrame = function(f) {
-    RAF(function() { if (TIMECOUNT < 3000) f(TIMEGETTER()); });
+    RAF(function() { if (TIMECOUNT < 50) f(TIMEGETTER()); });
   }
   
 }
