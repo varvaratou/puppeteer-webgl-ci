@@ -1,23 +1,27 @@
-let DEFAULTTIME = 5000;
+// this snippet works only in headless chrome
+if (navigator.webdriver) {
 
-// timer definition
-const TIMEGETTER = function() { return DEFAULTTIME; };
+  // timer definition
+  let TIMESTART = 5000;
+  let TIMECOUNT = 0;
+  const TIMEGETTER = function() {
+    TIMECOUNT++;
+    return TIMESTART + TIMECOUNT*16;
+  };
 
-// time calculated as Date.now()
-Date.now = TIMEGETTER;
+  // time calculated as Date.now()
+  window.Date.now = TIMEGETTER;
 
-// time calculated as performance.now()
-performance.now = TIMEGETTER;
+  // time calculated as performance.now()
+  window.performance.now = TIMEGETTER;
 
-// time calculated as ( new Date() ).getTime()
-Date.prototype.getTime = TIMEGETTER;
-
-// more complex injection
-const RAF = requestAnimationFrame;
-requestAnimationFrame = function(f) {
-  // time calculated in THREE.Clock.getDelta()
-  // ... replace Clock()?
+  // time calculated as ( new Date() ).getTime()
+  window.Date.prototype.getTime = TIMEGETTER;
 
   // time calculated in requstAnimationFrame() callback
-  RAF(function() { f(DEFAULTTIME); });
+  const RAF = window.requestAnimationFrame;
+  window.requestAnimationFrame = function(f) {
+    RAF(function() { if (TIMECOUNT < 3000) f(TIMEGETTER()); });
+  }
+  
 }
