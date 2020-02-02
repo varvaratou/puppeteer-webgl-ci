@@ -2,5 +2,5 @@ language: node_js
 node_js: node
 services: xvfb
 
-script:
-  - npm run ci
+before_script: TRAVIS=true
+script: npm run ci
