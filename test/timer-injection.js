@@ -24,5 +24,12 @@ if (navigator.webdriver) {
   window.requestAnimationFrame = function(f) {
     RAF(function() { if (TIMECOUNT < 50) f(TIMEGETTER()); });
   }
+
+  // pseudo random
+  let RANDOMSEED = Math.PI / 4;
+  window.Math.random = function() {
+    const x = Math.sin(RANDOMSEED++) * 10000;
+    return x - Math.floor(x);
+  };
   
 }
