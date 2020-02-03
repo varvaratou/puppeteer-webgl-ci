@@ -8,7 +8,8 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 |-----------------------------------------|------------------------------------------|
 | tiny configs                            | gaint configs                            |
 | slow                                    | fast                                     |
-| WebGL textures lead to 90% fill error?  | relatively correct                       |
+| not headless with WebGL (or need fix)   | headless                                 |
+| pass: 68 from 79 and terminated         | pass: 309 from 362 with <5% diff         |
 
 ### 2do list
 - [x] screenshot maker
@@ -17,4 +18,5 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 - [x] procedure that generate screenshots
 - [x] deterministic random for screenshot
 - [x] procedure that diff screenshots
-- [ ] rethink & refactor?
+- [ ] make more robust (canvas.zIndex=10000, fix bug with non deterministic RAF)
+- [ ] optimize (get rid of setTimeout)

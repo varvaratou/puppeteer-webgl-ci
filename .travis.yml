@@ -2,4 +2,4 @@ language: node_js
 node_js: node
 services: xvfb
 
-script: VIS=true npm run ci
+script: npm run ci
