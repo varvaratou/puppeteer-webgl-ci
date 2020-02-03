@@ -4,20 +4,19 @@
   "main": "puppeteer.js",
   "scripts": {
     "test": "node -r esm ./test/puppeteer.js",
-    "ci": "concurrently -k -s first \"npm:test\" \"npm:http\"",
-    "ci:visible": "cross-env VIS=true concurrently -k -s first \"npm:test\" \"npm:http\"",
-    "ci:generate": "cross-env GEN=true concurrently -k -s first \"npm:test\" \"npm:http\"",
-    "http": "http-server -c-1 -p 4321"
+    "ci": "npm run test",
+    "ci:visible": "cross-env VIS=true npm run test",
+    "ci:generate": "cross-env GEN=true npm run test"
   },
   "devDependencies": {
-    "concurrently": "^5.0.0",
     "cross-env": "^7.0.0",
     "esm": "^3.2.25",
-    "http-server": "^0.11.1",
+    "express": "^4.17.1",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
-    "puppeteer": "^2.0.0"
+    "puppeteer": "^2.1.0"
   },
   "author": "munrocket",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {}
 }

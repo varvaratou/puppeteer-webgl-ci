@@ -8,7 +8,7 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 |-----------------------------------------|------------------------------------------|
 | tiny configs                            | gaint configs                            |
 | slow                                    | fast                                     |
-| not support WebGL textures?             | relatively correct                       |
+| WebGL textures lead to 90% fill error?  | relatively correct                       |
 
 ### 2do list
 - [x] screenshot maker
@@ -17,4 +17,4 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 - [x] procedure that generate screenshots
 - [x] deterministic random for screenshot
 - [x] procedure that diff screenshots
-- [ ] rethink & refactor ?
+- [ ] rethink & refactor?
