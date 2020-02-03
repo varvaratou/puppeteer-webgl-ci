@@ -4,6 +4,12 @@
 
 This repo created in order to add WebGL automated testing with puppeteer in Three.js.
 
+|           Travis                        |               CircleCI                   |
+|-----------------------------------------|------------------------------------------|
+| tiny configs                            | gaint configs                            |
+| slow                                    | fast                                     |
+| not support WebGL textures?             | relatively correct                       |
+
 ### 2do list
 - [x] screenshot maker
 - [x] ci config for travis/circleci

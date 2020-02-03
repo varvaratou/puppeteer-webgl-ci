@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-three",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "puppeteer.js",
   "scripts": {
     "test": "node -r esm ./test/puppeteer.js",

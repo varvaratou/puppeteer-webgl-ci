@@ -2,5 +2,4 @@ language: node_js
 node_js: node
 services: xvfb
 
-before_script: npm install
 script: VIS=true npm run ci

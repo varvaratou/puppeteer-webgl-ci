@@ -6,9 +6,9 @@ import { PNG } from 'pngjs';
 const width = 800;
 const height = 600;
 const PORT = 4321;
-const DIFFMAX = 0.3;  // threshold in one pixel
+const DIFFMAX = 0.2;  // threshold in one pixel
 const DIFFNUM = 0.9;  // max number of pixels in percent (WAT? 90% is wrong?)
-const TIMEOUT = 900;
+const TIMEOUT = 2000;
 
 (async () => {
 
