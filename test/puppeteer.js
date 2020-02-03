@@ -17,11 +17,7 @@ const server = app.listen(PORT, async () => {
   // launch puppeteer with WebGL support in Linux
   puppeteer.launch({
     headless: !process.env.VIS,
-    args: [
-      '--use-gl=egl', '--no-sandbox', '--disable-setuid-sandbox'
-      //'--hide-scrollbars', '--enable-font-antialiasing',
-      //'--force-device-scale-factor=1', '--high-dpi-support=1',
-    ]
+    args: [ '--use-gl=egl', '--no-sandbox' ]
   }).then(async browser => {
 
     // initialize

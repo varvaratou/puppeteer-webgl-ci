@@ -8,8 +8,7 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 |-----------------------------------------|------------------------------------------|
 | tiny configs                            | gaint configs                            |
 | slow                                    | fast                                     |
-| not headless with WebGL (or need fix)   | headless                                 |
-| pass: 68 from 79 and terminated         | pass: 309 from 362 with <5% diff         |
+| pass: 302 from 362 with <5% diff        | pass: 310 from 362 with <5% diff         |
 
 ### 2do list
 - [x] screenshot maker
