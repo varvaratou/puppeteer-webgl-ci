@@ -4,7 +4,7 @@ import express from 'express';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 
-const PORT = 1234;
+const PORT = 8888;
 const MAXDIFF = 0.1;  // threshold in one pixel
 const TOTALDIFF = 0.05;  // total error <5% of pixels
 const TIMEOUT = 800;
@@ -27,7 +27,7 @@ const server = app.listen(PORT, async () => {
 
     // find target files
     let files = fs.readdirSync('./examples')
-      .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html')
+      .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' && f != 'webgl_test_memory.html')
       .map(s => s.slice(0, s.length - 5));
 
     let failedCount = 0;
@@ -36,8 +36,7 @@ const server = app.listen(PORT, async () => {
       // load target file
       let file = files[i];
       await page.setViewport({ width: 800, height: 600 });
-      await page.goto(`http://localhost:${PORT}/examples/${file}.html`);
-      await new Promise(r => setTimeout(r, TIMEOUT));
+      await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: 10000 });
       //document.getElementsByTagName('canvas')[0]).style.zIndex = 10000;
       
       // generate or diff screenshots

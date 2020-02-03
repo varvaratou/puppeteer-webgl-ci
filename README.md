@@ -17,5 +17,5 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 - [x] procedure that generate screenshots
 - [x] deterministic random for screenshot
 - [x] procedure that diff screenshots
+- [x] optimize (get rid of setTimeout)
 - [ ] make more robust (canvas.zIndex=10000, fix bug with non deterministic RAF)
-- [ ] optimize (get rid of setTimeout)
