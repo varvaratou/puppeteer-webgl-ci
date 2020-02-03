@@ -7,7 +7,7 @@ const width = 800;
 const height = 600;
 const PORT = 4321;
 const DIFFMAX = 0.3;  // threshold in one pixel
-const DIFFNUM = 0.5;  // max number of pixels in percent (WAT? 50%?)
+const DIFFNUM = 0.9;  // max number of pixels in percent (WAT? 90% is wrong?)
 const TIMEOUT = 900;
 
 (async () => {
@@ -15,12 +15,7 @@ const TIMEOUT = 900;
   // launch puppeteer with WebGL support in Linux
   puppeteer.launch({
     headless: !process.env.VIS,
-    args: [
-      '--hide-scrollbars',
-      '--enable-font-antialiasing',
-      '--force-device-scale-factor=1', '--high-dpi-support=1',
-      '--use-gl=egl', '--no-sandbox', '--disable-setuid-sandbox'
-    ]
+    args: ['--use-gl=egl']
   }).then(async browser => {
 
     // initialize
