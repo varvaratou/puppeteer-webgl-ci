@@ -8,7 +8,7 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 - [x] screenshot maker
 - [x] ci config for travis/circleci
 - [x] deterministic time for screenshot
-- [x] procedure that recalculate all examples
+- [x] procedure that generate screenshots
 - [x] deterministic random for screenshot
-- [ ] diff between two images
-- [ ] parallel testing in target folder
+- [x] procedure that diff screenshots
+- [ ] rethink & refactor ?
