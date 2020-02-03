@@ -13,11 +13,9 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 ### 2do list
 - [x] screenshot maker
 - [x] ci config for travis/circleci
-- [x] deterministic time for screenshot
+- [x] deterministic time & random for screenshot
 - [x] procedure that generate screenshots
-- [x] deterministic random for screenshot
 - [x] procedure that diff screenshots
-- [x] get rid of setTimeout(900)
-- [x] fix bug with non deterministic RAF
-- [x] hide title, datgui
-- [ ] refactor
+- [x] try to fix non deterministic RAF
+- [x] try to optimize (get rid of setTimeout)
+- [x] try to make robust (hide title and datgui)
