@@ -4,10 +4,9 @@ import express from 'express';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 
-const PORT = 8888;
+const PORT = 1111;
 const MAXDIFF = 0.1;  // threshold in one pixel
 const TOTALDIFF = 0.05;  // total error <5% of pixels
-const TIMEOUT = 800;
 
 // launch express server
 const app = express();
@@ -27,7 +26,7 @@ const server = app.listen(PORT, async () => {
 
     // find target files
     let files = fs.readdirSync('./examples')
-      .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' && f != 'webgl_test_memory.html')
+      .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html')
       .map(s => s.slice(0, s.length - 5));
 
     let failedCount = 0;
@@ -36,9 +35,19 @@ const server = app.listen(PORT, async () => {
       // load target file
       let file = files[i];
       await page.setViewport({ width: 800, height: 600 });
-      await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: 10000 });
+      try {
+        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle0', timeout: 20000 });
+        await page.evaluate(() => new Promise(res => setTimeout(res, 10)));
+      } catch (e) {
+        failedCount++;
+        console.log('\x1b[31m' + `TIMEOUT EXCEEDED! FILE: ${file}.html.'` + '\x1b[37m')
+        continue;
+      }
+
+
       //document.getElementsByTagName('canvas')[0]).style.zIndex = 10000;
       
+
       // generate or diff screenshots
       if (process.env.GEN) {
 

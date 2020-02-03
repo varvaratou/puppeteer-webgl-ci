@@ -1,33 +1,30 @@
-// this snippet works only in puppeteer
-if (navigator.webdriver) {
-
-  // deterministic timer
-  let TIMECOUNT = 0;
-  const TIMEGETTER = function() {
-    return 0;
-    //return TIMECOUNT*16; this is not deterministic for some reason
-  };
-
-  // time calculated as Date.now()
-  window.Date.now = TIMEGETTER;
-
-  // time calculated as ( new Date() ).getTime()
-  window.Date.prototype.getTime = TIMEGETTER;
-
-  // time calculated as performance.now()
-  window.performance.now = TIMEGETTER;
-
-  // time calculated in requstAnimationFrame() callback
-  const RAF = window.requestAnimationFrame;
-  window.requestAnimationFrame = function(f) {
-    RAF(function() { TIMECOUNT++; if (TIMECOUNT < 50) f(TIMEGETTER()); });
-  }
+(function() {
 
   // deterministic random
-  let RANDOMSEED = Math.PI / 4;
+  let seed = Math.PI / 4;
   window.Math.random = function() {
-    const x = Math.sin(RANDOMSEED++) * 10000;
+    const x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
   };
-  
-}
+
+  // deterministic timer
+  const now = function() { return 0; };
+  window.Date.now = now;
+  window.Date.prototype.getTime = now;
+  window.performance.getNow = performance.now;
+  window.performance.now = now;
+
+  // deterministic RAF
+  let lastTime = 0;
+  window.requestAnimationFrame = function(callback, element) {
+    let currTime = performance.getNow();
+    let timeToCall = lastTime ? Math.max(0, 200 - (currTime - lastTime)) : 0;
+    let id = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
+    lastTime = currTime + timeToCall;
+    return id;
+  };
+  window.cancelAnimationFrame = function(id) {
+    clearTimeout(id);
+  };
+
+}());
