@@ -12,7 +12,8 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | 0.1, 5%, 1500ms, 1000ms  |
 | 18 from 361 failed, time=23:22          | 16 from 361 failed, time=22:15          | 0.2, 5%, 2500ms, 2000ms  |
 | 19 from 361 failed, time=22:37          | 16 from 361 failed, time=21:26          | 0.2, 5%, 1900ms, 2000ms  |
-| 19 from 361 failed, time=22:37          | 16 from 361 failed, time=21:26          | 0.2, 5%, 1900ms, 2000ms  |
+| 32=9+5+8+10 failed, time=6:42           | 32=9+5+8+10 failed, time=6:04           | 0.2, 5%, 2500ms, 2000ms  |
+| ? failed, time=?                        | ? failed, time=?           | 0.2, 5%, 1900ms, 2000ms  |
 
 ### 2do list
 - [x] screenshot maker

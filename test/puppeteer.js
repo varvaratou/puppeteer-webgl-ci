@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;   // threshold in one pixel
 const totalDiff = 0.05;  // total error <5% of pixels
-const idleTime = 2500;
+const idleTime = 1900;
 const renderTime = 2000;
 
 // launch express server
