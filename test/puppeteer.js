@@ -1,24 +1,23 @@
 import puppeteer from 'puppeteer';
 import pixelmatch from 'pixelmatch';
 import express from 'express';
-import fs, { watchFile } from 'fs';
+import fs from 'fs';
 import { PNG } from 'pngjs';
 
-const PORT = 1234;
-const MAXDIFF = 0.2;     // threshold in one pixel
-const TOTALDIFF = 0.05;  // total error <5% of pixels
-const IDLETIME = 1500;
-const PRERENDTIME = 500;
-const RENDTIME = 2000;
+const port = 1234;
+const threshold = 0.2;   // threshold in one pixel
+const totalDiff = 0.05;  // total error <5% of pixels
+const idleTime = 2500;
+const renderTime = 2000;
 
 // launch express server
 const app = express();
 app.use(express.static(__dirname + '/../'));
-const server = app.listen(PORT, async () => {
+const server = app.listen(port, async () => {
 
   // launch puppeteer with WebGL support in Linux
   puppeteer.launch({
-    headless: !process.env.VIS,
+    headless: !process.env.VISIBLE,
     args: [ '--use-gl=egl', '--no-sandbox' ]
   }).then(async browser => {
 
@@ -28,17 +27,20 @@ const server = app.listen(PORT, async () => {
     await page.setViewport({ width: 800, height: 600 });
 
     // find target files
-    let files = fs.readdirSync('./examples')
+    const files = fs.readdirSync('./examples')
       .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' && f != 'webgl_test_memory2.html')
       .map(s => s.slice(0, s.length - 5));
 
-    let failedCount = 0;
-    for (let i = 0; i < files.length; i++) {
+    let failedScreenshot = 0;
+    const isParallel = 'CI' in process.env;
+    const beginId = isParallel ? Math.floor(parseInt(process.env.CI) * files.length / 4) : 0;
+    const endId = isParallel ? Math.floor((parseInt(process.env.CI) + 1) * files.length / 4) : files.length;
+    for (let id = beginId; id < endId; id++) {
 
       // load target file
-      let file = files[i];
+      let file = files[id];
       try {
-        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: IDLETIME });
+        await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: idleTime });
       } catch (e) {
         console.log('TIMEOUT EXCEEDED!');
       }
@@ -49,11 +51,10 @@ const server = app.listen(PORT, async () => {
                             body > div.dg.ac { display: none !important; }`;
         document.getElementsByTagName('head')[0].appendChild(style);
       });
-      await new Promise(function(resolve) { setTimeout(resolve, PRERENDTIME) });
-      await page.evaluate(() => { RESLOADED = true; });
-      await new Promise(function(resolve) { setTimeout(resolve, RENDTIME) }); //await page.waitForFunction('RENDERFINISHED');
+      await page.evaluate(() => { window.resoursesLoaded = true; });
+      await new Promise(function(resolve) { setTimeout(resolve, renderTime) });
 
-      if (process.env.GEN) {
+      if (process.env.GENERATE) {
 
         // generate screenshots
         await page.screenshot({ path: `./test/screenshot-samples/${file}.png`, fullPage: true});
@@ -66,31 +67,31 @@ const server = app.listen(PORT, async () => {
         let img1 = PNG.sync.read(fs.readFileSync(`./test/screenshot-samples/${file}.png`));
         let img2 = PNG.sync.read(fs.readFileSync(`./node_modules/temp.png`));
         let diff = new PNG({ width: img1.width, height: img1.height });
-        pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: MAXDIFF });
+        pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: threshold });
 
         // save and print result
         let stream = fs.createWriteStream(`./node_modules/diff.png`)
         diff.pack().pipe(stream);
         stream.end();
-        let totaldiff = diff.data
+        let currDiff = diff.data
           .filter((bit, i) => (i % 4 == 0) && (bit == 255) && (diff.data[i+1] == 0) && (diff.data[i+2] == 0))
           .reduce(sum => sum + 1, 0) / img1.width / img1.height;
-        if (totaldiff < TOTALDIFF) {
-          console.log('\x1b[32m' + `diff: ${totaldiff.toFixed(3)}, file: ${file}.html` + '\x1b[37m');
+        if (currDiff < totalDiff) {
+          console.log('\x1b[32m' + `diff: ${currDiff.toFixed(3)}, file: ${file}.html` + '\x1b[37m');
         } else {
-          failedCount++;
-          console.log('\x1b[31m' + `DIFF WRONG ON ${totaldiff.toFixed(3)} OF PIXELS IN FILE ${file}.html` + '\x1b[37m');
+          failedScreenshot++;
+          console.log('\x1b[31m' + `DIFF WRONG ON ${currDiff.toFixed(3)} OF PIXELS IN FILE ${file}.html` + '\x1b[37m');
         }
 
       } else {
-        failedCount++;
+        failedScreenshot++;
         console.log('\x1b[31m' + `SCRENSHOT NOT EXISTS! ${file}.html` + '\x1b[37m');
       }
     }
 
     server.close();
-    if (failedCount > 0) {
-      console.log('\x1b[31m' + `${failedCount} FROM ${files.length} SCRENSHOT FAILED`+ '\x1b[37m');
+    if (failedScreenshot > 0) {
+      console.log('\x1b[31m' + `${failedScreenshot} FROM ${files.length} SCRENSHOT FAILED`+ '\x1b[37m');
       //process.exit(1);
     }
     await browser.close();

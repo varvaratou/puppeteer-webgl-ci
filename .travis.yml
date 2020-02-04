@@ -2,4 +2,11 @@ language: node_js
 node_js: node
 services: xvfb
 
-script: npm run ci
+env:
+  - CI=0
+  - CI=1
+  - CI=2
+  - CI=3
+
+script:
+  - CI=$CI npm run ci

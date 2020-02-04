@@ -12,21 +12,16 @@
   const now = function() { return frameId * 16; };
   window.Date.now = now;
   window.Date.prototype.getTime = now;
-  window.performance.getNow = performance.now;
   window.performance.now = now;
 
   // deterministic RAF
-  const RAF = window.requestAnimationFrame;
-  window.RESLOADED = false;
-  window.RENDERFINISHED = false;
+  const rAF = window.requestAnimationFrame;
+  window.resoursesLoaded = false;
   window.requestAnimationFrame = function(cb) {
-    if (!RESLOADED) {
+    if (!window.resoursesLoaded) {
       window.setTimeout(function() { requestAnimationFrame(cb); }, 50);
     } else {
-      RAF(function() {
-        if (frameId++ < 1) { cb(now());
-        } else { RENDERFINISHED = true;}
-      });
+      rAF(function() { if (frameId++ < 1) { cb(now()) } });
     }
   }
 
