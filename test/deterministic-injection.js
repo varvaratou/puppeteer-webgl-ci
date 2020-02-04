@@ -8,16 +8,29 @@
   };
 
   // deterministic timer
-  const now = function() { return 0; };
+  let frameId = 0;
+  const now = function() { return frameId * 16; };
   window.Date.now = now;
   window.Date.prototype.getTime = now;
   window.performance.getNow = performance.now;
   window.performance.now = now;
 
   // deterministic RAF
-  let lastTime = 0;
-  window.requestAnimationFrame = function(callback) {
-    window.setTimeout(function() { callback(now()); }, 200);
-  };
+  const RAF = window.requestAnimationFrame;
+  window.RESLOADED = false;
+  window.RENDERFINISHED = false;
+  window.requestAnimationFrame = function(cb) {
+    if (!RESLOADED) {
+      window.setTimeout(function() { requestAnimationFrame(cb); }, 50);
+    } else {
+      RAF(function() {
+        if (frameId++ < 2) {
+          cb(now());
+        } else {
+          RENDERFINISHED = true;
+        }
+      });
+    }
+  }
 
 }());

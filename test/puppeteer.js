@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer';
 import pixelmatch from 'pixelmatch';
 import express from 'express';
-import fs from 'fs';
+import fs, { watchFile } from 'fs';
 import { PNG } from 'pngjs';
 
 const PORT = 1234;
@@ -21,7 +21,8 @@ const server = app.listen(PORT, async () => {
 
     let page = (await browser.pages())[0];
     const injection = fs.readFileSync('test/deterministic-injection.js', 'utf8');
-    page.evaluateOnNewDocument(injection);
+    await page.evaluateOnNewDocument(injection);
+    await page.setViewport({ width: 800, height: 600 });
 
     // find target files
     let files = fs.readdirSync('./examples')
@@ -29,17 +30,15 @@ const server = app.listen(PORT, async () => {
       .map(s => s.slice(0, s.length - 5));
 
     let failedCount = 0;
-    for (let i = 0; i < files.length; i++) {
+    for (let i = 10; i < files.length; i++) {
 
       // load target file
       let file = files[i];
-      await page.setViewport({ width: 800, height: 600 });
       try {
-        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: 2000 });
+        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: 1500 });
       } catch (e) {
         console.log('TIMEOUT EXCEEDED!');
       }
-      await page.evaluate(() => { new Promise(res => setTimeout(res, 300)) }); //wtf?
       await page.evaluate(() => {
         let style = document.createElement('style');
         style.type = 'text/css';
@@ -47,6 +46,8 @@ const server = app.listen(PORT, async () => {
                             body > div.dg.ac { display: none !important; }`;
         document.getElementsByTagName('head')[0].appendChild(style);
       });
+      await page.evaluate(() => { RESLOADED = true; });
+      await new Promise(function(resolve) { setTimeout(resolve, 1000) }); //await page.waitForFunction('RENDERFINISHED');
 
       if (process.env.GEN) {
 
