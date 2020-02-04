@@ -12,6 +12,7 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | 0.1, 5%, 1500ms, 1000ms  |
 | 18 from 361 failed, time=23:22          | 16 from 361 failed, time=22:15          | 0.2, 5%, 2500ms, 2000ms  |
 | 19 from 361 failed, time=22:37          | 16 from 361 failed, time=21:26          | 0.2, 5%, 1900ms, 2000ms  |
+| ???          | ???          | 0.2, 5%, 1500ms+500s, 2000ms  |
 
 ### 2do list
 - [x] screenshot maker
@@ -20,4 +21,4 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 - [x] procedure that generate screenshots
 - [x] procedure that diff screenshots
 - [x] try to make robust (hide title and datgui)
-- [x] turn off RAF -> 'networkidle2' -> turn on deterministic RAF -> wait until rendering
+- [x] turn off RAF -> 'networkidle0' -> turn on deterministic RAF -> wait until rendering

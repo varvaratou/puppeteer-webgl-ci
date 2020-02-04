@@ -7,8 +7,9 @@ import { PNG } from 'pngjs';
 const PORT = 1234;
 const MAXDIFF = 0.2;     // threshold in one pixel
 const TOTALDIFF = 0.05;  // total error <5% of pixels
-const IDLETIME = 1900;
-const RENDTIME = 1800;
+const IDLETIME = 1500;
+const PRERENDTIME = 500;
+const RENDTIME = 2000;
 
 // launch express server
 const app = express();
@@ -48,6 +49,7 @@ const server = app.listen(PORT, async () => {
                             body > div.dg.ac { display: none !important; }`;
         document.getElementsByTagName('head')[0].appendChild(style);
       });
+      await new Promise(function(resolve) { setTimeout(resolve, PRERENDTIME) });
       await page.evaluate(() => { RESLOADED = true; });
       await new Promise(function(resolve) { setTimeout(resolve, RENDTIME) }); //await page.waitForFunction('RENDERFINISHED');
 

@@ -24,11 +24,8 @@
       window.setTimeout(function() { requestAnimationFrame(cb); }, 50);
     } else {
       RAF(function() {
-        if (frameId++ < 1) {
-          cb(now());
-        } else {
-          RENDERFINISHED = true;
-        }
+        if (frameId++ < 1) { cb(now());
+        } else { RENDERFINISHED = true;}
       });
     }
   }
