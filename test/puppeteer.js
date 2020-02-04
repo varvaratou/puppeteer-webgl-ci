@@ -5,8 +5,10 @@ import fs, { watchFile } from 'fs';
 import { PNG } from 'pngjs';
 
 const PORT = 1234;
-const MAXDIFF = 0.1;     // threshold in one pixel
+const MAXDIFF = 0.2;     // threshold in one pixel
 const TOTALDIFF = 0.05;  // total error <5% of pixels
+const IDLETIME = 2500;
+const RENDTIME = 2000;
 
 // launch express server
 const app = express();
@@ -30,12 +32,12 @@ const server = app.listen(PORT, async () => {
       .map(s => s.slice(0, s.length - 5));
 
     let failedCount = 0;
-    for (let i = 10; i < files.length; i++) {
+    for (let i = 0; i < files.length; i++) {
 
       // load target file
       let file = files[i];
       try {
-        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: 1500 });
+        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: IDLETIME });
       } catch (e) {
         console.log('TIMEOUT EXCEEDED!');
       }
@@ -47,7 +49,7 @@ const server = app.listen(PORT, async () => {
         document.getElementsByTagName('head')[0].appendChild(style);
       });
       await page.evaluate(() => { RESLOADED = true; });
-      await new Promise(function(resolve) { setTimeout(resolve, 1000) }); //await page.waitForFunction('RENDERFINISHED');
+      await new Promise(function(resolve) { setTimeout(resolve, RENDTIME) }); //await page.waitForFunction('RENDERFINISHED');
 
       if (process.env.GEN) {
 
@@ -65,7 +67,9 @@ const server = app.listen(PORT, async () => {
         pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: MAXDIFF });
 
         // save and print result
-        diff.pack().pipe(fs.createWriteStream(`./node_modules/diff.png`));
+        let stream = fs.createWriteStream(`./node_modules/diff.png`)
+        diff.pack().pipe(stream);
+        stream.end();
         let totaldiff = diff.data
           .filter((bit, i) => (i % 4 == 0) && (bit == 255) && (diff.data[i+1] == 0) && (diff.data[i+2] == 0))
           .reduce(sum => sum + 1, 0) / img1.width / img1.height;

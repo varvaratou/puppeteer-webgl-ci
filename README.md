@@ -4,16 +4,17 @@
 
 This repo created in order to add WebGL automated testing with puppeteer in Three.js.
 
-|           Travis                        |               CircleCI                   |
-|-----------------------------------------|------------------------------------------|
-| tiny configs                            | gaint configs                            |
-| slow                                    | fast                                     |
-| pass: 302 from 362 with <5% diff        | pass: 310 from 362 with <5% diff         |
+|           Travis                        |               CircleCI                   |         Settings         |
+|-----------------------------------------|------------------------------------------|--------------------------|
+| tiny configs                            | gaint configs                            |                          |
+| slow                                    | fast                                     |                          |
+| 22 FROM 361 SCRENSHOT FAILED            | 22 FROM 361 SCRENSHOT FAILED             | 0.1, 5%, 1500ms, 1000ms  |
+| ???                                     | ???                                      | 0.2, 5%, 2500ms, 2000ms  |
 
 ### 2do list
 - [x] screenshot maker
 - [x] ci config for travis/circleci
-- [x] deterministic time & random for screenshot
+- [x] deterministic random/timer for screenshot
 - [x] procedure that generate screenshots
 - [x] procedure that diff screenshots
 - [x] try to make robust (hide title and datgui)
