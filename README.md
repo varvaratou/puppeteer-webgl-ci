@@ -7,10 +7,11 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 |           Travis                        |            CircleCI                     |         Settings         |
 |-----------------------------------------|-----------------------------------------|--------------------------|
 | tiny configs                            | gaint configs                           |                          |
-| slow                                    | fast                                    |                          |
-| 22 from 361 failed, time=15m18s         | 22 from 361 failed, time=15m18s         | 0.1, 5%, 1500ms, 1000ms  |
-| 18 from 361 failed, time=23m22s         | 16 FROM 361 failed, time=22m15s         | 0.2, 5%, 2500ms, 2000ms  |
-| ???                                     | ???                                     | 0.2, 5%, 1900ms, 2000ms  |
+| slow in small projects                  | fast in small projects                  |                          |
+| 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | with old RAF             |
+| 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | 0.1, 5%, 1500ms, 1000ms  |
+| 18 from 361 failed, time=23:22          | 16 from 361 failed, time=22:15          | 0.2, 5%, 2500ms, 2000ms  |
+| 19 from 361 failed, time=22:37          | 16 from 361 failed, time=21:26          | 0.2, 5%, 1900ms, 2000ms  |
 
 ### 2do list
 - [x] screenshot maker

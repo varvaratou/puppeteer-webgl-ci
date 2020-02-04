@@ -8,7 +8,7 @@ const PORT = 1234;
 const MAXDIFF = 0.2;     // threshold in one pixel
 const TOTALDIFF = 0.05;  // total error <5% of pixels
 const IDLETIME = 1900;
-const RENDTIME = 2000;
+const RENDTIME = 1800;
 
 // launch express server
 const app = express();
