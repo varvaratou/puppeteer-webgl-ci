@@ -19,14 +19,13 @@ const server = app.listen(PORT, async () => {
     args: [ '--use-gl=egl', '--no-sandbox' ]
   }).then(async browser => {
 
-    // initialize
     let page = (await browser.pages())[0];
     const injection = fs.readFileSync('test/deterministic-injection.js', 'utf8');
     page.evaluateOnNewDocument(injection);
 
     // find target files
     let files = fs.readdirSync('./examples')
-      .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html')
+      .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' && f != 'webgl_test_memory2.html')
       .map(s => s.slice(0, s.length - 5));
 
     let failedCount = 0;
@@ -36,26 +35,22 @@ const server = app.listen(PORT, async () => {
       let file = files[i];
       await page.setViewport({ width: 800, height: 600 });
       try {
-        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: 12000 });
+        await page.goto(`http://localhost:${PORT}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: 2000 });
       } catch (e) {
         console.log('TIMEOUT EXCEEDED!');
       }
+      await page.evaluate(() => { new Promise(res => setTimeout(res, 300)) }); //wtf?
       await page.evaluate(() => {
-        try {
-          var style = document.createElement('style');
-          style.type = 'text/css';
-          style.innerHTML = `
-            #info { display: none !important; }
-            #container div { display: none !important; }
-            body > div.dg.ac { display: none !important; }
-          `;
-          document.getElementsByTagName('head')[0].appendChild(style);
-        } catch {}
-      })
+        let style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = ` #info { display: none !important; }
+                            body > div.dg.ac { display: none !important; }`;
+        document.getElementsByTagName('head')[0].appendChild(style);
+      });
 
-      // generate or diff screenshots
       if (process.env.GEN) {
 
+        // generate screenshots
         await page.screenshot({ path: `./test/screenshot-samples/${file}.png`, fullPage: true});
         console.log('\x1b[32m' + `file: ${file}.html generated` + '\x1b[37m');
 

@@ -17,14 +17,7 @@
   // deterministic RAF
   let lastTime = 0;
   window.requestAnimationFrame = function(callback) {
-    let currTime = performance.getNow();
-    let timeToCall = lastTime ? Math.max(0, 200 - (currTime - lastTime)) : 0;
-    let id = window.setTimeout(function() { callback(currTime + timeToCall); }, timeToCall);
-    lastTime = currTime + timeToCall;
-    return id;
-  };
-  window.cancelAnimationFrame = function(id) {
-    clearTimeout(id);
+    window.setTimeout(function() { callback(now()); }, 200);
   };
 
 }());

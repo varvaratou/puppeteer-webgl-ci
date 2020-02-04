@@ -16,6 +16,5 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 - [x] deterministic time & random for screenshot
 - [x] procedure that generate screenshots
 - [x] procedure that diff screenshots
-- [x] try to fix non deterministic RAF
-- [x] try to optimize (get rid of setTimeout)
 - [x] try to make robust (hide title and datgui)
+- [ ] turn off RAF -> 'networkidle2' -> turn on deterministic RAF -> wait until rendering
