@@ -24,7 +24,7 @@
       window.setTimeout(function() { requestAnimationFrame(cb); }, 50);
     } else {
       RAF(function() {
-        if (frameId++ < 2) {
+        if (frameId++ < 1) {
           cb(now());
         } else {
           RENDERFINISHED = true;
