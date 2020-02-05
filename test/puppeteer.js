@@ -10,7 +10,7 @@ const totalDiff = 0.05;    // total diff <5% of pixels
 const networkTimeout = 2500;
 let renderTimeout = 3000;
 const checkInterval = 0;
-const glueInterval = 0;
+let glueInterval = 0;
 
 console.rlog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
 console.glog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
@@ -50,8 +50,16 @@ const server = app.listen(port, async () => {
       // load target file
       let file = files[id];
       if (file == 'webgl_test_memory2') continue;
-      if (file == 'raytracing_sandbox') renderTimeout += 4000;
-      if (file == 'webgl_materials_cars') renderTimeout += 1000;
+      if (file == 'raytracing_sandbox') { renderTimeout += 3000; page.evaluate(() => { window.maxFrameId = 2 }) }
+      if (file == 'webgl_materials_blending') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
+      if (file == 'webgl_materials_blending_custom') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
+      if (file == 'webgl_materials_cars') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) }
+      if (file == 'webgl_materials_envmaps_hdr_nodes') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
+      if (file == 'webgl_materials_envmaps_parallax') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
+      if (file == 'webgl_materials_envmaps_pmrem_nodes') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
+      if (file == 'webgl_materials_nodes') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
+      if (file == 'webgl_simple_gi') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
+      if (file == 'webvr_multiview') { glueInterval += 1000; renderTimeout += 2000; page.evaluate(() => { window.maxFrameId = 10 }) } 
       try {
         await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
       } catch (e) {

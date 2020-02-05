@@ -9,6 +9,7 @@
 
   // deterministic timer
   let frameId = 0;
+  window.maxFrameId = 1;
   const now = function() { return frameId * 16; };
   window.Date.now = now;
   window.Date.prototype.getTime = now;
@@ -26,7 +27,7 @@
       }, 50);
     } else {
       rAF(function() {
-        if (frameId++ < 1) {
+        if (frameId++ < maxFrameId) {
           cb(now());
         } else {
           window.renderFinished = true;

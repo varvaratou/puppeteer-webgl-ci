@@ -10,7 +10,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline             |
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline             |
 | 19=3+2+7+7 failed,  time=6:27           | 18=3+2+7+6 failed,  time=6:06            | with parallelism         |
-| 12=2+1+7+2 failed,  time=4:07           | 9 =1+1+6+2 failed,  time=4:12            | with render promise      |
+| 11=1+1+7+2 failed,  time=4:07           | 9 =1+1+6+2 failed,  time=4:12            | with render promise      |
 
 ### 2do list
 - [x] screenshot maker
@@ -29,12 +29,9 @@ npm run ci:gen
 # check all screenshots in console
 npm run ci
 
-# prefix for windows users
-npx cross-env <shell_command>
-
 # prefix for one screenshot
-FILE=<name> <shell_command>
+npx cross-env FILE=<name> <shell_command>
 
 # prefix for one quater of all screenshots
-CI=<0/1/2/3> <shell_command>
+npx cross-env CI=<0/1/2/3> <shell_command>
 ```
