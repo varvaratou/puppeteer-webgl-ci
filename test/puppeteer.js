@@ -5,10 +5,10 @@ import fs from 'fs';
 import { PNG } from 'pngjs';
 
 const port = 1234;
-const threshold = 0.2;   // threshold in one pixel
-const totalDiff = 0.05;  // total redLog <5% of pixels
+const threshold = 0.2;     // threshold in one pixel
+const totalDiff = 0.05;    // total diff <5% of pixels
 const networkTimeout = 2750;
-const renderTimeout = 3750;
+const renderTimeout = 4000;
 const checkInterval = 0;
 const glueInterval = 0;
 
