@@ -50,22 +50,22 @@ const server = app.listen(port, async () => {
       // load target file
       let file = files[id];
       if (file == 'webgl_test_memory2') continue;
-      if (file == 'raytracing_sandbox') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) }
-      if (file == 'webgl_materials_blending') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_blending_custom') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_cars') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) }
-      if (file == 'webgl_materials_envmaps_hdr_nodes') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_envmaps_parallax') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_envmaps_pmrem_nodes') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_nodes') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_simple_gi') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webvr_multiview') { renderTimeout += 5000; page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'raytracing_sandbox') { renderTimeout += 3000; }
+      if (file == 'webgl_materials_blending') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webgl_materials_blending_custom') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webgl_materials_cars') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) }
+      if (file == 'webgl_materials_envmaps_hdr_nodes') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webgl_materials_envmaps_parallax') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webgl_materials_envmaps_pmrem_nodes') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webgl_materials_nodes') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webgl_simple_gi') { renderTimeout += 6000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webvr_multiview') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
       try {
         await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
       } catch (e) {
         console.log('Network timeout exceeded...');
       }
-      await new Promise((resolve) => setTimeout(resolve, glueInterval));
+      await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
 
       // start rendering
       await page.evaluate((file) => {
@@ -86,11 +86,11 @@ const server = app.listen(port, async () => {
         }
         window.renderStarted = true;
       }, file);
-      await new Promise((resolve) => setTimeout(resolve, glueInterval));
+      await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
 
       // wait until rendering
       await page.evaluate(async (renderTimeout, checkInterval) => {
-        await new Promise(function(resolve) {
+        await new Promise(function(resolve, _) {
           let renderStart = performance.wow();
           let waitingLoop = setInterval(function() {
             let renderEcceded = (performance.wow() - renderStart > renderTimeout);
@@ -102,7 +102,7 @@ const server = app.listen(port, async () => {
           }, checkInterval);
         })
       }, renderTimeout, checkInterval);
-      await new Promise((resolve) => setTimeout(resolve, glueInterval));
+      await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
 
       if (process.env.GENERATE) {
 
