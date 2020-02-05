@@ -10,10 +10,7 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 | slow in small projects                  | fast in small projects                  |                          |
 | 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | with old RAF             |
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | 0.1, 5%, 1500ms, 1000ms  |
-| 18 from 361 failed, time=23:22          | 16 from 361 failed, time=22:15          | 0.2, 5%, 2500ms, 2000ms  |
-| 19 from 361 failed, time=22:37          | 16 from 361 failed, time=21:26          | 0.2, 5%, 1900ms, 2000ms  |
-| 32=9+5+8+10 failed, time=6:42           | 32=9+5+8+10 failed, time=6:04           | 0.2, 5%, 2500ms, 2000ms  |
-| ? failed, time=?                        | ? failed, time=?           | 0.2, 5%, 1900ms, 2000ms  |
+| 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | 0.2, 5%, 1900ms, 2000ms  |
 
 ### 2do list
 - [x] screenshot maker
