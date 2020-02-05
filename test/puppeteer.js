@@ -43,23 +43,29 @@ const server = app.listen(port, async () => {
     const endId = isParallel ? Math.floor((parseInt(process.env.CI.slice(-1)) + 1) * files.length / 4) : files.length;
     for (let id = beginId; id < endId; id++) {
 
-      // load target file
+      // settiongs and exceptions
       let file = files[id];
-      let networkTimeout = 2500;
-      let renderTimeout = 3000;
+      let networkTimeout = 2500;    // puppeteer internal variable
+      let glueInterval = 0;         // good for envmap, additional textures and draco
+      let renderTimeout = 3000;     // render promise timeout
       let checkInterval = 0;
-      let glueInterval = 0;
-      if (file == 'raytracing_sandbox') { renderTimeout += 3000; }
-      if (file == 'webgl_materials_blending') { await page.evaluate(() => { window.maxFrameId = 20 }) } 
-      if (file == 'webgl_materials_blending_custom') { await page.evaluate(() => { window.maxFrameId = 20 }) } 
-      if (file == 'webgl_materials_cars') { glueInterval += 500; await page.evaluate(() => { window.maxFrameId = 20 }) }
-      if (file == 'webgl_materials_envmaps_hdr_nodes') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) }
-      if (file == 'webgl_materials_envmaps_parallax') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) }
-      if (file == 'webgl_materials_envmaps_pmrem_nodes') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) }
-      if (file == 'webgl_materials_nodes') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) } 
-      if (file == 'webgl_simple_gi') { renderTimeout += 3000; await page.evaluate(() => { window.maxFrameId = 1 }) } 
+      if (file == 'misc_controls_deviceorientation') glueInterval += 2000;
+      if (file == 'raytracing_sandbox') renderTimeout += 3000;
+      if (file == 'webgl_loader_draco') glueInterval += 2000;
+      if (file == 'webgl_materials_blending') { glueInterval += 1000; await page.evaluate(() => { window.maxFrameId = 5 }); }
+      if (file == 'webgl_materials_blending_custom') { glueInterval += 1000; await page.evaluate(() => { window.maxFrameId = 5 }); }
+      if (file == 'webgl_materials_cars') glueInterval += 2000;
+      if (file == 'webgl_materials_envmaps_hdr') glueInterval += 2000;
+      if (file == 'webgl_materials_envmaps_hdr_nodes') glueInterval += 3000;
+      if (file == 'webgl_materials_envmaps_parallax') glueInterval += 3000;
+      if (file == 'webgl_materials_envmaps_pmrem_nodes') glueInterval += 3000;
+      if (file == 'webgl_materials_nodes') glueInterval += 2000;
+      if (file == 'webgl_simple_gi') renderTimeout += 3000;
       if (file == 'webgl_test_memory2') continue;
-      if (file == 'webvr_multiview') continue;
+      if (file == 'webgl_video_panorama_equirectangular') glueInterval += 2000;
+      if (file == 'webxr_vr_multiview') glueInterval += 2000;
+
+      // load target file
       try {
         await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
       } catch (e) {
@@ -86,7 +92,6 @@ const server = app.listen(port, async () => {
         }
         window.renderStarted = true;
       }, file);
-      await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
 
       // wait until rendering
       await page.evaluate(async (renderTimeout, checkInterval) => {
