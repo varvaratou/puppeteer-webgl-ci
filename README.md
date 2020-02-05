@@ -19,25 +19,20 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 - [x] procedure that generate screenshots
 - [x] procedure that diff screenshots
 - [x] try to make robust (hide text and datgui)
-- [x] new pipeline: turn off RAF -> 'networkidle2' -> turn on 1 RAF -> wait until rendering
+- [x] new pipeline: turn off RAF -> 'networkidle2' -> turn on RAF -> promise for rendering
 - [x] 4 parallel ci
 
-### Contributing: help me to cover last examples
-Clone repository, run following commands and send me .zip file with screenshots
-```
-cross-env GENERATE=webgl2_multisampled_renderbuffers npm run ci && 
-cross-env GENERATE=webgl_loader_draco npm run ci && 
-cross-env GENERATE=webgl_loader_gltf npm run ci && 
-cross-env GENERATE=webgl_loader_gltf_extensions npm run ci && 
-cross-env GENERATE=webgl_materials_blending npm run ci && 
-cross-env GENERATE=webgl_materials_blending_custom npm run ci &&
-cross-env GENERATE=webgl_materials_envmaps_hdr_nodes npm run ci && 
-cross-env GENERATE=webgl_materials_envmaps_pmrem_nodes npm run ci && 
-cross-env GENERATE=webgl_materials_texture_anisotropy npm run ci && 
-cross-env GENERATE=webgl_postprocessing_procedural npm run ci && 
-cross-env GENERATE=webgl_shaders_tonemapping npm run ci && 
-cross-env GENERATE=webgl_shadowmap_vsm npm run ci && 
-cross-env GENERATE=webgl_simple_gi npm run ci && 
-cross-env GENERATE=webgl_video_panorama_equirectangular npm run ci && 
-cross-env GENERATE=webvr_multiview npm run ci
+### Local usage
+```shell
+# generate one screenshot 
+GENERATE=<name> npm run ci
+
+# generate all screenshots
+npm run ci:gen
+
+# check all screenshots in console
+npm run ci
+
+# choose one quater of all screenshot
+CI=<0..3> <any_previous_shell_command>
 ```

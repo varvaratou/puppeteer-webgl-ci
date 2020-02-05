@@ -7,11 +7,11 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;   // threshold in one pixel
 const totalDiff = 0.05;  // total redLog <5% of pixels
-const idleTime = 2500;
-const renderTime = 2000;
+const networkTimeout = 2500;
+const renderTimeout = 2500;
 
-console.rlog = function(str) { console.log(`\x1b[31m${str}\x1b[37m`)}
-console.glog = function(str) { console.log(`\x1b[32m${str}\x1b[37m`)}
+console.rlog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
+console.glog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
 
 // launch express server
 const app = express();
@@ -25,9 +25,12 @@ const server = app.listen(port, async () => {
   }).then(async browser => {
 
     let page = (await browser.pages())[0];
+    await page.setViewport({ width: 800, height: 600 });
+    page.on('console', msg => {
+      if (msg.text() == 'Render timeout exceeded...') console.log(msg.text());
+    });
     const injection = fs.readFileSync('test/deterministic-injection.js', 'utf8');
     await page.evaluateOnNewDocument(injection);
-    await page.setViewport({ width: 800, height: 600 });
 
     // find target files
     const files = fs.readdirSync('./examples')
@@ -37,6 +40,7 @@ const server = app.listen(port, async () => {
         ((process.env.GENERATE == 'ALL' || f == process.env.GENERATE + '.html') || !process.env.GENERATE))
       .map(s => s.slice(0, s.length - 5));
 
+    // forEach with CI parallelism
     let failedScreenshot = 0;
     const isParallel = 'CI' in process.env;
     const beginId = isParallel ? Math.floor(parseInt(process.env.CI) * files.length / 4) : 0;
@@ -46,10 +50,12 @@ const server = app.listen(port, async () => {
       // load target file
       let file = files[id];
       try {
-        await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: idleTime });
+        await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
       } catch (e) {
-        console.log('TIMEOUT EXCEEDED!');
+        console.log('Network timeout exceeded...');
       }
+
+      // start rendering
       await page.evaluate((file) => {
         let style = document.createElement('style');
         style.type = 'text/css';
@@ -65,15 +71,29 @@ const server = app.listen(port, async () => {
         if (file == 'misc_animation_authoring') {
           [].pototype.forEach.call(document.getElementsByTagName('div'), function (e) { e.style.display = 'none' });
         }
-        window.resoursesLoaded = true;
+        window.renderStarted = true;
       });
-      await new Promise(function(resolve) { setTimeout(resolve, renderTime) });
+
+      // wait until rendering
+      await page.evaluate(async (renderTimeout) => {
+        await new Promise(function(resolve) {
+          let renderStart = performance.wow();
+          let waitingLoop = setInterval(function() {
+            let isEcceded = (performance.wow() - renderStart > renderTimeout);
+            if (window.renderFinished || isEcceded) {
+              if (isEcceded) console.log('Render timeout exceeded...');;
+              clearInterval(waitingLoop);
+              resolve();
+            }
+          }, 200);
+        })
+      }, renderTimeout);
 
       if (process.env.GENERATE) {
 
         // generate screenshots
         await page.screenshot({ path: `./test/screenshot-samples/${file}.png`, fullPage: true});
-        console.glog(`file: ${file}.html generated`);
+        console.glog(`file: ${file} generated`);
 
       } else if (fs.existsSync(`./test/screenshot-samples/${file}.png`)) {
 
@@ -82,7 +102,11 @@ const server = app.listen(port, async () => {
         let img1 = PNG.sync.read(fs.readFileSync(`./test/screenshot-samples/${file}.png`));
         let img2 = PNG.sync.read(fs.readFileSync(`./node_modules/temp.png`));
         let diff = new PNG({ width: img1.width, height: img1.height });
-        pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: threshold });
+        try {
+          pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: threshold });
+        } catch(e) {
+          console.rlog(`ERROR! Image sizes does not match in file: ${file}`)
+        }
 
         // save and print result
         let stream = fs.createWriteStream(`./node_modules/diff.png`)
@@ -92,21 +116,21 @@ const server = app.listen(port, async () => {
           .filter((bit, i) => (i % 4 == 0) && (bit == 255) && (diff.data[i+1] == 0) && (diff.data[i+2] == 0))
           .reduce(sum => sum + 1, 0) / img1.width / img1.height;
         if (currDiff < totalDiff) {
-          console.glog(`diff: ${currDiff.toFixed(3)}, file: ${file}.html`);
+          console.glog(`diff: ${currDiff.toFixed(3)}, file: ${file}`);
         } else {
           failedScreenshot++;
-          console.rlog(`DIFF WRONG ON ${currDiff.toFixed(3)} OF PIXELS IN FILE ${file}.html`);
+          console.rlog(`ERROR! Diff wrong in ${currDiff.toFixed(3)} of pixels in file: ${file}`);
         }
 
       } else {
         failedScreenshot++;
-        console.rlog(`SCRENSHOT NOT EXISTS! ${file}.html`);
+        console.rlog(`ERROR! Screenshot not exists: ${file}`);
       }
     }
 
     server.close();
     if (failedScreenshot > 0) {
-      console.rlog(`${failedScreenshot} FROM ${files.length} SCRENSHOT FAILED`);
+      console.rlog(`TESTS FAILED! ${failedScreenshot} from ${files.length} screenshots not pass`);
       //process.exit(1);
     }
     await browser.close();

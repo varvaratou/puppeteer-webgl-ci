@@ -12,16 +12,26 @@
   const now = function() { return frameId * 16; };
   window.Date.now = now;
   window.Date.prototype.getTime = now;
+  window.performance.wow = performance.now;
   window.performance.now = now;
 
   // deterministic RAF
   const rAF = window.requestAnimationFrame;
-  window.resoursesLoaded = false;
+  window.renderStarted = false;
+  window.renderFinished = false;
   window.requestAnimationFrame = function(cb) {
-    if (!window.resoursesLoaded) {
-      window.setTimeout(function() { requestAnimationFrame(cb); }, 50);
+    if (!window.renderStarted) {
+      window.setTimeout(function() {
+        requestAnimationFrame(cb);
+      }, 50);
     } else {
-      rAF(function() { if (frameId++ < 1) { cb(now()) } });
+      rAF(function() {
+        if (frameId++ < 2) {
+          cb(now());
+        } else {
+          window.renderFinished = true;
+        }
+      });
     }
   }
 
