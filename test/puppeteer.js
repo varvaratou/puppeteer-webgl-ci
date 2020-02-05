@@ -7,8 +7,9 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;   // threshold in one pixel
 const totalDiff = 0.05;  // total redLog <5% of pixels
-const networkTimeout = 2500;
-const renderTimeout = 2500;
+const networkTimeout = 4000;
+const renderTimeout = 4000;
+const checkInterval = 400;
 
 console.rlog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
 console.glog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
@@ -69,25 +70,26 @@ const server = app.listen(port, async () => {
         let button = document.getElementById('startButton');
         if (button) button.click();
         if (file == 'misc_animation_authoring') {
-          [].pototype.forEach.call(document.getElementsByTagName('div'), function (e) { e.style.display = 'none' });
+          let divs = document.getElementsByTagName('div')
+          for(let i = 0; i < divs.length; i++) divs[i].style.display = 'none'
         }
         window.renderStarted = true;
-      });
+      }, file);
 
       // wait until rendering
-      await page.evaluate(async (renderTimeout) => {
+      await page.evaluate(async (renderTimeout, checkInterval) => {
         await new Promise(function(resolve) {
           let renderStart = performance.wow();
           let waitingLoop = setInterval(function() {
-            let isEcceded = (performance.wow() - renderStart > renderTimeout);
-            if (window.renderFinished || isEcceded) {
-              if (isEcceded) console.log('Render timeout exceeded...');;
+            let renderEcceded = (performance.wow() - renderStart > renderTimeout);
+            if (window.renderFinished || renderEcceded) {
+              if (renderEcceded) console.log('Render timeout exceeded...');;
               clearInterval(waitingLoop);
               resolve();
             }
-          }, 200);
+          }, checkInterval);
         })
-      }, renderTimeout);
+      }, renderTimeout, checkInterval);
 
       if (process.env.GENERATE) {
 

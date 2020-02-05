@@ -26,7 +26,7 @@
       }, 50);
     } else {
       rAF(function() {
-        if (frameId++ < 2) {
+        if (frameId++ < 1) {
           cb(now());
         } else {
           window.renderFinished = true;
