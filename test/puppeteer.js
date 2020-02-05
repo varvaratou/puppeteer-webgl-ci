@@ -50,7 +50,7 @@ const server = app.listen(port, async () => {
       // load target file
       let file = files[id];
       if (file == 'webgl_test_memory2') continue;
-      if (file == 'raytracing_sandbox') renderTimeout += 2500;
+      if (file == 'raytracing_sandbox') renderTimeout += 4000;
       if (file == 'webgl_materials_cars') renderTimeout += 1000;
       try {
         await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
