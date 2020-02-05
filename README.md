@@ -9,8 +9,8 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | tiny configs                            | gaint configs                           |                          |
 | 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline             |
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline             |
-| 19=3+2+7+7 failed,  time=6:27           | 18=3+2+7+6 failed,  time=6:06            | with parallelism         |
-| 15=2+1+7+5 failed,  time=4:39           | 9 =1+1+6+6 failed,  time=4:14            | with render promise      |
+| 19=3+2+7+7 failed,  time=6:27           | 18=3+2+7+6 failed,  time=6:06           | with parallelism         |
+| 11=2+1+6+2 failed,  time=4:29           | 11=1+1+6+3 failed,  time=4:41           | with render promise      |
 
 ### 2do list
 - [x] screenshot maker

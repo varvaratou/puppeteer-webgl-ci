@@ -49,21 +49,23 @@ const server = app.listen(port, async () => {
       let glueInterval = 0;         // good for envmap, additional textures and draco
       let renderTimeout = 3000;     // render promise timeout
       let checkInterval = 0;
-      if (file == 'misc_controls_deviceorientation') glueInterval += 2000;
+      if (file == 'misc_controls_deviceorientation') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }) }
       if (file == 'raytracing_sandbox') renderTimeout += 3000;
       if (file == 'webgl_loader_draco') glueInterval += 2000;
-      if (file == 'webgl_materials_blending') { glueInterval += 1000; await page.evaluate(() => { window.maxFrameId = 5 }); }
-      if (file == 'webgl_materials_blending_custom') { glueInterval += 1000; await page.evaluate(() => { window.maxFrameId = 5 }); }
-      if (file == 'webgl_materials_cars') glueInterval += 2000;
+      if (file == 'webgl_materials_blending') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }); }
+      if (file == 'webgl_materials_blending_custom') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }); }
+      if (file == 'webgl_materials_cars') { glueInterval += 3000; renderTimeout += 0; }
       if (file == 'webgl_materials_envmaps_hdr') glueInterval += 2000;
       if (file == 'webgl_materials_envmaps_hdr_nodes') glueInterval += 3000;
-      if (file == 'webgl_materials_envmaps_parallax') glueInterval += 3000;
-      if (file == 'webgl_materials_envmaps_pmrem_nodes') glueInterval += 3000;
+      if (file == 'webgl_materials_envmaps_parallax') { renderTimeout += 3000; glueInterval += 500; await page.evaluate(() => { window.maxFrameId = 2 });}
+      if (file == 'webgl_materials_envmaps_pmrem_nodes') { renderTimeout += 1000; glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 });}
       if (file == 'webgl_materials_nodes') glueInterval += 2000;
+      if (file == 'webgl_nearestneighbour') glueInterval += 2000;
       if (file == 'webgl_simple_gi') renderTimeout += 3000;
       if (file == 'webgl_test_memory2') continue;
-      if (file == 'webgl_video_panorama_equirectangular') glueInterval += 2000;
-      if (file == 'webxr_vr_multiview') glueInterval += 2000;
+      if (file == 'webgl_video_panorama_equirectangular') glueInterval += 500;
+      if (file == 'webgl_worker_offscreencanvas') { networkTimeout = 0; renderTimeout = 0; }
+      if (file == 'webxr_vr_multiview') { renderTimeout += 2000; await page.evaluate(() => { window.maxFrameId = 2 }); }
 
       // load target file
       try {
