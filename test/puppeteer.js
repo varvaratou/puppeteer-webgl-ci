@@ -8,7 +8,7 @@ const port = 1234;
 const threshold = 0.2;     // threshold in one pixel
 const totalDiff = 0.05;    // total diff <5% of pixels
 const networkTimeout = 2750;
-const renderTimeout = 4250;
+let renderTimeout = 3000;
 const checkInterval = 0;
 const glueInterval = 0;
 
@@ -36,10 +36,8 @@ const server = app.listen(port, async () => {
 
     // find target files
     const files = fs.readdirSync('./examples')
-      .filter(
-        f => f.match(new RegExp(`.*\.(.html)`, 'ig')) &&
-        f != 'index.html' && f != 'webgl_test_memory2.html' && // <-exceptions
-        ((process.env.GENERATE == 'ALL' || f == process.env.GENERATE + '.html') || !process.env.GENERATE))
+      .filter( f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' &&
+                    (!process.env.FILE || (process.env.FILE && f == process.env.FILE + '.html')))
       .map(s => s.slice(0, s.length - 5));
 
     // forEach with CI parallelism
@@ -51,6 +49,8 @@ const server = app.listen(port, async () => {
 
       // load target file
       let file = files[id];
+      if (file == 'webgl_test_memory2') continue;
+      if (file == 'raytracing_sandbox') renderTimeout += 2000;
       try {
         await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
       } catch (e) {
@@ -124,12 +124,12 @@ const server = app.listen(port, async () => {
         if (currDiff < totalDiff) {
           console.glog(`diff: ${currDiff.toFixed(3)}, file: ${file}`);
         } else {
-          failedScreenshot++;
+          ++failedScreenshot;
           console.rlog(`ERROR! Diff wrong in ${currDiff.toFixed(3)} of pixels in file: ${file}`);
         }
 
       } else {
-        failedScreenshot++;
+        ++failedScreenshot;
         console.rlog(`ERROR! Screenshot not exists: ${file}`);
       }
     }

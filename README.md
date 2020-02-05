@@ -23,15 +23,18 @@ This repo created in order to add WebGL automated testing with puppeteer in Thre
 
 ### Local usage
 ```shell
-# generate one screenshot 
-GENERATE=<name> npm run ci
-
 # generate all screenshots
 npm run ci:gen
 
 # check all screenshots in console
 npm run ci
 
-# choose one quater of all screenshot
-CI=<0..3> <any_previous_shell_command>
+# prefix for windows users
+npx cross-env <shell_command>
+
+# prefix for one screenshot
+FILE=<name> <shell_command>
+
+# prefix for one quater of all screenshots
+CI=<0/1/2/3> <shell_command>
 ```
