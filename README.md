@@ -23,6 +23,9 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 ### Local usage
 ```shell
+# generate one screenshot
+npx cross-env FILE=<name> npm run ci:gen
+
 # generate all screenshots
 npm run ci:gen
 
