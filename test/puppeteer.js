@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;     // threshold in one pixel
 const totalDiff = 0.05;    // total diff <5% of pixels
-const networkTimeout = 2750;
+const networkTimeout = 2500;
 let renderTimeout = 3000;
 const checkInterval = 0;
 const glueInterval = 0;
@@ -50,7 +50,8 @@ const server = app.listen(port, async () => {
       // load target file
       let file = files[id];
       if (file == 'webgl_test_memory2') continue;
-      if (file == 'raytracing_sandbox') renderTimeout += 2000;
+      if (file == 'raytracing_sandbox') renderTimeout += 2500;
+      if (file == 'webgl_materials_cars') renderTimeout += 1000;
       try {
         await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
       } catch (e) {
