@@ -7,10 +7,10 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;   // threshold in one pixel
 const totalDiff = 0.05;  // total redLog <5% of pixels
-const networkTimeout = 5000;
-const renderTimeout = 5000;
-const checkInterval = 100;
-const glueInterval = 300;
+const networkTimeout = 2750;
+const renderTimeout = 3750;
+const checkInterval = 0;
+const glueInterval = 0;
 
 console.rlog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
 console.glog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
@@ -56,7 +56,6 @@ const server = app.listen(port, async () => {
       } catch (e) {
         console.log('Network timeout exceeded...');
       }
-
       await new Promise((resolve) => setTimeout(resolve, glueInterval));
 
       // start rendering
@@ -78,7 +77,6 @@ const server = app.listen(port, async () => {
         }
         window.renderStarted = true;
       }, file);
-
       await new Promise((resolve) => setTimeout(resolve, glueInterval));
 
       // wait until rendering
@@ -95,7 +93,6 @@ const server = app.listen(port, async () => {
           }, checkInterval);
         })
       }, renderTimeout, checkInterval);
-
       await new Promise((resolve) => setTimeout(resolve, glueInterval));
 
       if (process.env.GENERATE) {
