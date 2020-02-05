@@ -20,34 +20,34 @@ function init( canvas, width, height, pixelRatio, path ) {
 
 		var texture = new THREE.CanvasTexture( imageBitmap );
 
-			var geometry = new THREE.IcosahedronBufferGeometry( 5, 3 );
-			var materials = [
-				new THREE.MeshMatcapMaterial( { color: 0xaa24df, matcap: texture } ),
-				new THREE.MeshMatcapMaterial( { color: 0x605d90, matcap: texture } ),
-				new THREE.MeshMatcapMaterial( { color: 0xe04a3f, matcap: texture } ),
-				new THREE.MeshMatcapMaterial( { color: 0xe30456, matcap: texture } )
-			];
+		var geometry = new THREE.IcosahedronBufferGeometry( 5, 3 );
+		var materials = [
+			new THREE.MeshMatcapMaterial( { color: 0xaa24df, matcap: texture } ),
+			new THREE.MeshMatcapMaterial( { color: 0x605d90, matcap: texture } ),
+			new THREE.MeshMatcapMaterial( { color: 0xe04a3f, matcap: texture } ),
+			new THREE.MeshMatcapMaterial( { color: 0xe30456, matcap: texture } )
+		];
 
-			for ( var i = 0; i < 100; i ++ ) {
+		for ( var i = 0; i < 100; i ++ ) {
 
-				var material = materials[ i % materials.length ];
-				var mesh = new THREE.Mesh( geometry, material );
-				mesh.position.x = random() * 200 - 100;
-				mesh.position.y = random() * 200 - 100;
-				mesh.position.z = random() * 200 - 100;
-				mesh.scale.setScalar( random() + 1 );
-				group.add( mesh );
+			var material = materials[ i % materials.length ];
+			var mesh = new THREE.Mesh( geometry, material );
+			mesh.position.x = random() * 200 - 100;
+			mesh.position.y = random() * 200 - 100;
+			mesh.position.z = random() * 200 - 100;
+			mesh.scale.setScalar( random() + 1 );
+			group.add( mesh );
 
-			}
+		}
 
-			renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
-			renderer.setPixelRatio( pixelRatio );
-			renderer.setSize( width, height, false );
+		renderer = new THREE.WebGLRenderer( { antialias: true, canvas: canvas } );
+		renderer.setPixelRatio( pixelRatio );
+		renderer.setSize( width, height, false );
 
-			animate();
+		animate();
 
-		} );
-	});
+	} );
+
 }
 
 function animate() {

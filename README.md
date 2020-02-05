@@ -23,18 +23,18 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 ### Local usage
 ```shell
-# generate one screenshot
-npx cross-env FILE=<name> npm run ci:gen
-
 # generate all screenshots
 npm run ci:gen
+
+# prefix to one scrcreenshot
+npx cross-env FILE=<name> npm run ci:gen
+
+# prefix for quaters of all screenshots (from first to last digit)
+npx cross-env CI=0123 <shell_command>
 
 # check all screenshots in console
 npm run ci
 
-# prefix for one screenshot
-npx cross-env FILE=<name> <shell_command>
-
-# prefix for one quater of all screenshots
-npx cross-env CI=<0/1/2/3> <shell_command>
+# check one file
+npx cross-env FILE=<name> npm run ci
 ```

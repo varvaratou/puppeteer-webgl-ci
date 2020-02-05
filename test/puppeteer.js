@@ -7,10 +7,6 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;     // threshold in one pixel
 const totalDiff = 0.05;    // total diff <5% of pixels
-const networkTimeout = 2500;
-let renderTimeout = 3000;
-const checkInterval = 0;
-let glueInterval = 0;
 
 console.rlog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
 console.glog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
@@ -43,23 +39,27 @@ const server = app.listen(port, async () => {
     // forEach with CI parallelism
     let failedScreenshot = 0;
     const isParallel = 'CI' in process.env;
-    const beginId = isParallel ? Math.floor(parseInt(process.env.CI) * files.length / 4) : 0;
-    const endId = isParallel ? Math.floor((parseInt(process.env.CI) + 1) * files.length / 4) : files.length;
+    const beginId = isParallel ? Math.floor(parseInt(process.env.CI.slice(0,1)) * files.length / 4) : 0;
+    const endId = isParallel ? Math.floor((parseInt(process.env.CI.slice(-1)) + 1) * files.length / 4) : files.length;
     for (let id = beginId; id < endId; id++) {
 
       // load target file
       let file = files[id];
-      if (file == 'webgl_test_memory2') continue;
+      let networkTimeout = 2500;
+      let renderTimeout = 3000;
+      let checkInterval = 0;
+      let glueInterval = 0;
       if (file == 'raytracing_sandbox') { renderTimeout += 3000; }
-      if (file == 'webgl_materials_blending') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_blending_custom') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_cars') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) }
-      if (file == 'webgl_materials_envmaps_hdr_nodes') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_envmaps_parallax') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_envmaps_pmrem_nodes') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_materials_nodes') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webgl_simple_gi') { renderTimeout += 6000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
-      if (file == 'webvr_multiview') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 }) } 
+      if (file == 'webgl_materials_blending') { await page.evaluate(() => { window.maxFrameId = 20 }) } 
+      if (file == 'webgl_materials_blending_custom') { await page.evaluate(() => { window.maxFrameId = 20 }) } 
+      if (file == 'webgl_materials_cars') { glueInterval += 500; await page.evaluate(() => { window.maxFrameId = 20 }) }
+      if (file == 'webgl_materials_envmaps_hdr_nodes') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) }
+      if (file == 'webgl_materials_envmaps_parallax') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) }
+      if (file == 'webgl_materials_envmaps_pmrem_nodes') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) }
+      if (file == 'webgl_materials_nodes') { glueInterval += 2000; await page.evaluate(() => { window.maxFrameId = 1 }) } 
+      if (file == 'webgl_simple_gi') { renderTimeout += 3000; await page.evaluate(() => { window.maxFrameId = 1 }) } 
+      if (file == 'webgl_test_memory2') continue;
+      if (file == 'webvr_multiview') continue;
       try {
         await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
       } catch (e) {
@@ -93,7 +93,7 @@ const server = app.listen(port, async () => {
         await new Promise(function(resolve, _) {
           let renderStart = performance.wow();
           let waitingLoop = setInterval(function() {
-            let renderEcceded = (performance.wow() - renderStart > renderTimeout);
+            let renderEcceded = (performance.wow() - renderStart > renderTimeout * window.maxFrameId);
             if (window.renderFinished || renderEcceded) {
               if (renderEcceded) console.log('Render timeout exceeded...');;
               clearInterval(waitingLoop);
@@ -102,7 +102,6 @@ const server = app.listen(port, async () => {
           }, checkInterval);
         })
       }, renderTimeout, checkInterval);
-      await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
 
       if (process.env.GENERATE) {
 

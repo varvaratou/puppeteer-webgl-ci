@@ -157,14 +157,12 @@ THREE.Projector = function () {
 		var uvs = [];
 
 		var object = null;
-		var material = null;
 
 		var normalMatrix = new THREE.Matrix3();
 
 		function setObject( value ) {
 
 			object = value;
-			material = object.material;
 
 			normalMatrix.getNormalMatrix( object.matrixWorld );
 
@@ -414,7 +412,7 @@ THREE.Projector = function () {
 		_viewMatrix.copy( camera.matrixWorldInverse );
 		_viewProjectionMatrix.multiplyMatrices( camera.projectionMatrix, _viewMatrix );
 
-		_frustum.setFromMatrix( _viewProjectionMatrix );
+		_frustum.setFromProjectionMatrix( _viewProjectionMatrix );
 
 		//
 
