@@ -6,9 +6,12 @@ import { PNG } from 'pngjs';
 
 const port = 1234;
 const threshold = 0.2;   // threshold in one pixel
-const totalDiff = 0.05;  // total error <5% of pixels
-const idleTime = 1900;
+const totalDiff = 0.05;  // total redLog <5% of pixels
+const idleTime = 2500;
 const renderTime = 2000;
+
+console.rlog = function(str) { console.log(`\x1b[31m${str}\x1b[37m`)}
+console.glog = function(str) { console.log(`\x1b[32m${str}\x1b[37m`)}
 
 // launch express server
 const app = express();
@@ -28,7 +31,10 @@ const server = app.listen(port, async () => {
 
     // find target files
     const files = fs.readdirSync('./examples')
-      .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' && f != 'webgl_test_memory2.html')
+      .filter(
+        f => f.match(new RegExp(`.*\.(.html)`, 'ig')) &&
+        f != 'index.html' && f != 'webgl_test_memory2.html' && // <-exceptions
+        ((process.env.GENERATE == 'ALL' || f == process.env.GENERATE + '.html') || !process.env.GENERATE))
       .map(s => s.slice(0, s.length - 5));
 
     let failedScreenshot = 0;
@@ -44,21 +50,30 @@ const server = app.listen(port, async () => {
       } catch (e) {
         console.log('TIMEOUT EXCEEDED!');
       }
-      await page.evaluate(() => {
+      await page.evaluate((file) => {
         let style = document.createElement('style');
         style.type = 'text/css';
-        style.innerHTML = ` #info { display: none !important; }
-                            body > div.dg.ac { display: none !important; }`;
+        style.innerHTML = `body { font size: 0 !important; }
+          #info, button, input, body>div.dg.ac, body>div.lbl { display: none !important; }`;
         document.getElementsByTagName('head')[0].appendChild(style);
+        let canvas = document.getElementsByTagName('canvas');
+        for (let i = 0; i < canvas.length; i++) {
+          if (canvas[i].height == 48) canvas[i].style.display = 'none';
+        }
+        let button = document.getElementById('startButton');
+        if (button) button.click();
+        if (file == 'misc_animation_authoring') {
+          [].pototype.forEach.call(document.getElementsByTagName('div'), function (e) { e.style.display = 'none' });
+        }
+        window.resoursesLoaded = true;
       });
-      await page.evaluate(() => { window.resoursesLoaded = true; });
       await new Promise(function(resolve) { setTimeout(resolve, renderTime) });
 
       if (process.env.GENERATE) {
 
         // generate screenshots
         await page.screenshot({ path: `./test/screenshot-samples/${file}.png`, fullPage: true});
-        console.log('\x1b[32m' + `file: ${file}.html generated` + '\x1b[37m');
+        console.glog(`file: ${file}.html generated`);
 
       } else if (fs.existsSync(`./test/screenshot-samples/${file}.png`)) {
 
@@ -77,21 +92,21 @@ const server = app.listen(port, async () => {
           .filter((bit, i) => (i % 4 == 0) && (bit == 255) && (diff.data[i+1] == 0) && (diff.data[i+2] == 0))
           .reduce(sum => sum + 1, 0) / img1.width / img1.height;
         if (currDiff < totalDiff) {
-          console.log('\x1b[32m' + `diff: ${currDiff.toFixed(3)}, file: ${file}.html` + '\x1b[37m');
+          console.glog(`diff: ${currDiff.toFixed(3)}, file: ${file}.html`);
         } else {
           failedScreenshot++;
-          console.log('\x1b[31m' + `DIFF WRONG ON ${currDiff.toFixed(3)} OF PIXELS IN FILE ${file}.html` + '\x1b[37m');
+          console.rlog(`DIFF WRONG ON ${currDiff.toFixed(3)} OF PIXELS IN FILE ${file}.html`);
         }
 
       } else {
         failedScreenshot++;
-        console.log('\x1b[31m' + `SCRENSHOT NOT EXISTS! ${file}.html` + '\x1b[37m');
+        console.rlog(`SCRENSHOT NOT EXISTS! ${file}.html`);
       }
     }
 
     server.close();
     if (failedScreenshot > 0) {
-      console.log('\x1b[31m' + `${failedScreenshot} FROM ${files.length} SCRENSHOT FAILED`+ '\x1b[37m');
+      console.rlog(`${failedScreenshot} FROM ${files.length} SCRENSHOT FAILED`);
       //process.exit(1);
     }
     await browser.close();

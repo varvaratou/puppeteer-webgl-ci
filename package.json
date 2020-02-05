@@ -3,10 +3,9 @@
   "version": "0.0.2",
   "main": "puppeteer.js",
   "scripts": {
-    "test": "node -r esm ./test/puppeteer.js",
-    "ci": "npm run test",
-    "ci:vis": "cross-env VISIBLE=true npm run test",
-    "ci:gen": "cross-env GENERATE=true npm run test"
+    "ci": "node -r esm ./test/puppeteer.js",
+    "ci:vis": "cross-env VISIBLE=true npm run ci",
+    "ci:gen": "cross-env GENERATE=ALL npm run ci"
   },
   "devDependencies": {
     "cross-env": "^7.0.0",
