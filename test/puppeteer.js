@@ -10,20 +10,30 @@ const totalDiff = 0.05;     // total diff <5% of pixels
 let networkTimeout = 2500;  // puppeteer networkidle2 timeout
 let renderTimeout = 3000;   // promise timeout for render 
 let glueInterval = 0;       // timeout between each step
-
-let exceptionList = ['webgl2_multisampled_renderbuffers', 'webgl_loader_draco',
-  'webgl_loader_draco', 'webgl_materials_blending', 'webgl_materials_blending_custom',
-  'webgl_materials_car', 'webgl_materials_envmaps_hdr', 'webgl_materials_envmaps_hdr_nodes',
-  'webgl_materials_envmaps_parallax', 'webgl_materials_envmaps_pmrem_nodes',
-  'webgl_video_panorama_equirectangular', 'webgl_worker_offscreencanvas', 'webxr_vr_multiview']
+let exceptionList = [
+  'misc_controls_deviceorientation',
+  'webgl2_multisampled_renderbuffers',
+  'webgl_loader_draco',
+  'webgl_materials_blending',
+  'webgl_materials_blending_custom',
+  'webgl_materials_car',
+  'webgl_materials_envmaps_hdr',
+  'webgl_materials_envmaps_hdr_nodes',
+  'webgl_materials_envmaps_parallax',
+  'webgl_materials_envmaps_pmrem_nodes',
+  'webgl_test_memory2',     // impossible to cover, ever
+  'webgl_video_panorama_equirectangular',
+  'webgl_worker_offscreencanvas',
+  'webxr_vr_multiview'
+];
 
 // launch express server
 const app = express();
 app.use(express.static(__dirname + '/../'));
-const server = app.listen(port, async () => pu );
+const server = app.listen(port, async () => pup );
 
 // launch puppeteer with WebGL support in Linux
-let pu = puppeteer.launch({
+let pup = puppeteer.launch({
   headless: !process.env.VISIBLE,
   args: [ '--use-gl=egl', '--no-sandbox' ]
 }).then(async browser => {
@@ -38,8 +48,8 @@ let pu = puppeteer.launch({
 
   // find target files
   const files = fs.readdirSync('./examples')
-    .filter( f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' &&
-                  (!process.env.FILE || (process.env.FILE && f == process.env.FILE + '.html')))
+    .filter(f => f.match(new RegExp(`.*\.(.html)`, 'ig')) && f != 'index.html' &&
+                (!process.env.FILE || (process.env.FILE && f == process.env.FILE + '.html')))
     .map(s => s.slice(0, s.length - 5));
 
   // forEach file with CI parallelism
@@ -51,10 +61,9 @@ let pu = puppeteer.launch({
 
     // load target file
     let file = files[id];
-    if (file == 'webgl_test_memory2') continue;
     if (exceptionList.includes(file)) continue;
     try {
-      await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle2', timeout: networkTimeout });
+      await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle0', timeout: networkTimeout });
     } catch (e) {
       console.log('Network timeout exceeded...');
     }
@@ -75,7 +84,7 @@ let pu = puppeteer.launch({
       if (button) button.click();
       if (file == 'misc_animation_authoring') {
         let divs = document.getElementsByTagName('div')
-        for(let i = 0; i < divs.length; i++) divs[i].style.display = 'none'
+        for(let i = 0; i < divs.length; i++) divs[i].style.display = 'none';
       }
       window.renderStarted = true;
     }, file);
@@ -88,7 +97,7 @@ let pu = puppeteer.launch({
         let waitingLoop = setInterval(function() {
           let renderEcceded = (performance.wow() - renderStart > renderTimeout * window.maxFrameId);
           if (window.renderFinished || renderEcceded) {
-            if (renderEcceded) console.log('Render timeout exceeded...');;
+            if (renderEcceded) console.log('Render timeout exceeded...');
             clearInterval(waitingLoop);
             resolve();
           }
@@ -117,7 +126,7 @@ let pu = puppeteer.launch({
       }
 
       // save and print result
-      let stream = fs.createWriteStream(`./node_modules/diff.png`)
+      let stream = fs.createWriteStream(`./node_modules/diff.png`);
       diff.pack().pipe(stream);
       stream.end();
       let currDiff = diff.data
@@ -138,9 +147,11 @@ let pu = puppeteer.launch({
 
   server.close();
   if (failedScreenshot > 0) {
-    console.redLog(`TESTS FAILED! ${failedScreenshot} from ${files.length} screenshots not pass`);
+    console.redLog(`TEST FAILED! ${failedScreenshot} from ${files.length - exceptionList.length} screenshots not pass.`);
     process.exit(1);
+  } else {
+    console.greenLog(`TEST PASSED! ${files.length - exceptionList.length} screenshots correctly rendered.`);
+    await browser.close();
   }
-  await browser.close();
 
 });
