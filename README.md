@@ -10,7 +10,8 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline             |
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline             |
 | 19=3+2+7+7 failed,  time=6:27           | 18=3+2+7+6 failed,  time=6:06           | with parallelism         |
-| 11=2+1+6+2 failed,  time=4:29           | 11=1+1+6+3 failed,  time=4:41           | with render promise      |
+| ??? failed,  time=???           | ??? failed,  time=???           | with render promise      |
+| 11=1+1+7+3 failed,  time=4:49           | 11=1+1+4+3 failed,  time=4:23           | with exceptions          |
 
 ### 2do list
 - [x] screenshot maker
@@ -19,7 +20,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - [x] procedure that check screenshots
 - [x] try to make robust (hide text, datgui, etc.)
 - [x] ci config with parallelism for travis/circleci
-- [x] pipeline: turn off RAF -> 'networkidle2' -> turn on RAF -> render promise
+- [x] pipeline: turn off RAF -> 'networkidle2' -> turn on deterministic RAF -> render promise
 
 ### Local usage
 ```shell
@@ -29,7 +30,7 @@ npm run ci:gen
 # prefix to one scrcreenshot
 npx cross-env FILE=<name> npm run ci:gen
 
-# prefix for quaters of all screenshots (from first to last digit)
+# prefix for some part of screenshots (from first to last digit, limits 0-3,)
 npx cross-env CI=0123 <shell_command>
 
 # check all screenshots in console

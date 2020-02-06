@@ -8,8 +8,8 @@ const port = 1234;
 const threshold = 0.2;     // threshold in one pixel
 const totalDiff = 0.05;    // total diff <5% of pixels
 
-console.rlog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
-console.glog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
+console.redLog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
+console.greenLog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
 
 // launch express server
 const app = express();
@@ -49,23 +49,23 @@ const server = app.listen(port, async () => {
       let glueInterval = 0;         // good for envmap, additional textures and draco
       let renderTimeout = 3000;     // render promise timeout
       let checkInterval = 0;
-      if (file == 'misc_controls_deviceorientation') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }) }
-      if (file == 'raytracing_sandbox') renderTimeout += 3000;
-      if (file == 'webgl_loader_draco') glueInterval += 2000;
-      if (file == 'webgl_materials_blending') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }); }
-      if (file == 'webgl_materials_blending_custom') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }); }
-      if (file == 'webgl_materials_cars') { glueInterval += 3000; renderTimeout += 0; }
-      if (file == 'webgl_materials_envmaps_hdr') glueInterval += 2000;
-      if (file == 'webgl_materials_envmaps_hdr_nodes') glueInterval += 3000;
-      if (file == 'webgl_materials_envmaps_parallax') { renderTimeout += 3000; glueInterval += 500; await page.evaluate(() => { window.maxFrameId = 2 });}
-      if (file == 'webgl_materials_envmaps_pmrem_nodes') { renderTimeout += 1000; glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 });}
-      if (file == 'webgl_materials_nodes') glueInterval += 2000;
-      if (file == 'webgl_nearestneighbour') glueInterval += 2000;
-      if (file == 'webgl_simple_gi') renderTimeout += 3000;
-      if (file == 'webgl_test_memory2') continue;
-      if (file == 'webgl_video_panorama_equirectangular') glueInterval += 500;
-      if (file == 'webgl_worker_offscreencanvas') { networkTimeout = 0; renderTimeout = 0; }
-      if (file == 'webxr_vr_multiview') { renderTimeout += 2000; await page.evaluate(() => { window.maxFrameId = 2 }); }
+      // if (file == 'misc_controls_deviceorientation') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }) }
+      // if (file == 'raytracing_sandbox') renderTimeout += 3000;
+      // if (file == 'webgl_loader_draco') glueInterval += 2000;
+      // if (file == 'webgl_materials_blending') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }); }
+      // if (file == 'webgl_materials_blending_custom') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }); }
+      // if (file == 'webgl_materials_cars') { glueInterval += 3000; renderTimeout += 0; }
+      // if (file == 'webgl_materials_envmaps_hdr') glueInterval += 2000;
+      // if (file == 'webgl_materials_envmaps_hdr_nodes') glueInterval += 3000;
+      // if (file == 'webgl_materials_envmaps_parallax') { renderTimeout += 3000; glueInterval += 500; await page.evaluate(() => { window.maxFrameId = 2 });}
+      // if (file == 'webgl_materials_envmaps_pmrem_nodes') { renderTimeout += 1000; glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 2 });}
+      // if (file == 'webgl_materials_nodes') glueInterval += 2000;
+      // if (file == 'webgl_nearestneighbour') glueInterval += 2000;
+      // if (file == 'webgl_simple_gi') renderTimeout += 3000;
+      if (file == 'webgl_test_memory2') continue; // imposible to cover
+      // if (file == 'webgl_video_panorama_equirectangular') glueInterval += 500;
+      // if (file == 'webgl_worker_offscreencanvas') { networkTimeout = 0; renderTimeout = 0; }
+      // if (file == 'webxr_vr_multiview') { renderTimeout += 2000; await page.evaluate(() => { window.maxFrameId = 2 }); }
 
       // load target file
       try {
@@ -114,7 +114,7 @@ const server = app.listen(port, async () => {
 
         // generate screenshots
         await page.screenshot({ path: `./test/screenshot-samples/${file}.png`, fullPage: true});
-        console.glog(`file: ${file} generated`);
+        console.greenLog(`file: ${file} generated`);
 
       } else if (fs.existsSync(`./test/screenshot-samples/${file}.png`)) {
 
@@ -126,7 +126,7 @@ const server = app.listen(port, async () => {
         try {
           pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: threshold });
         } catch(e) {
-          console.rlog(`ERROR! Image sizes does not match in file: ${file}`)
+          console.redLog(`ERROR! Image sizes does not match in file: ${file}`)
         }
 
         // save and print result
@@ -137,21 +137,21 @@ const server = app.listen(port, async () => {
           .filter((bit, i) => (i % 4 == 0) && (bit == 255) && (diff.data[i+1] == 0) && (diff.data[i+2] == 0))
           .reduce(sum => sum + 1, 0) / img1.width / img1.height;
         if (currDiff < totalDiff) {
-          console.glog(`diff: ${currDiff.toFixed(3)}, file: ${file}`);
+          console.greenLog(`diff: ${currDiff.toFixed(3)}, file: ${file}`);
         } else {
           ++failedScreenshot;
-          console.rlog(`ERROR! Diff wrong in ${currDiff.toFixed(3)} of pixels in file: ${file}`);
+          console.redLog(`ERROR! Diff wrong in ${currDiff.toFixed(3)} of pixels in file: ${file}`);
         }
 
       } else {
         ++failedScreenshot;
-        console.rlog(`ERROR! Screenshot not exists: ${file}`);
+        console.redLog(`ERROR! Screenshot not exists: ${file}`);
       }
     }
 
     server.close();
     if (failedScreenshot > 0) {
-      console.rlog(`TESTS FAILED! ${failedScreenshot} from ${files.length} screenshots not pass`);
+      console.redLog(`TESTS FAILED! ${failedScreenshot} from ${files.length} screenshots not pass`);
       //process.exit(1);
     }
     await browser.close();
