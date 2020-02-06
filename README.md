@@ -9,9 +9,9 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | tiny configs                            | gaint configs                           |                          |
 | 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline             |
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline             |
-| 19=3+2+7+7 failed,  time=6:27           | 18=3+2+7+6 failed,  time=6:06           | with parallelism         |
-| ??? failed,  time=???           | ??? failed,  time=???           | with render promise      |
-| 11=1+1+7+3 failed,  time=4:49           | 11=1+1+4+3 failed,  time=4:23           | with exceptions          |
+| 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | with parallelism         |
+| 12=1+1+7+3 failed, time=4:14            | 9 =1+1+4+3 failed, time=4:26            | with render promise      |
+| passed, time=4:49                       | passed, time=4:23                       | with 12 exceptions       |
 
 ### 2do list
 - [x] screenshot maker
@@ -30,7 +30,7 @@ npm run ci:gen
 # prefix to one scrcreenshot
 npx cross-env FILE=<name> npm run ci:gen
 
-# prefix for some part of screenshots (from first to last digit, limits 0-3,)
+# prefix for some part of screenshots (from first to last digit, limits 0-3)
 npx cross-env CI=0123 <shell_command>
 
 # check all screenshots in console

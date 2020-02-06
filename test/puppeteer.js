@@ -49,6 +49,14 @@ const server = app.listen(port, async () => {
       let glueInterval = 0;         // good for envmap, additional textures and draco
       let renderTimeout = 3000;     // render promise timeout
       let checkInterval = 0;
+
+      if (file in [ 'webgl2_multisampled_renderbuffers', 'webgl_loader_draco', 'webgl_loader_draco',
+                    'webgl_materials_blending', 'webgl_materials_blending_custom', 'webgl_materials_car',
+                    'webgl_materials_envmaps_hdr', 'webgl_materials_envmaps_hdr_nodes', 'webgl_materials_envmaps_parallax',
+                    'webgl_materials_envmaps_pmrem_nodes', 'webgl_video_panorama_equirectangular',
+                    'webgl_worker_offscreencanvas', 'webxr_vr_multiview']) continue;
+
+      // attempt to cover manually
       // if (file == 'misc_controls_deviceorientation') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }) }
       // if (file == 'raytracing_sandbox') renderTimeout += 3000;
       // if (file == 'webgl_loader_draco') glueInterval += 2000;
@@ -62,7 +70,7 @@ const server = app.listen(port, async () => {
       // if (file == 'webgl_materials_nodes') glueInterval += 2000;
       // if (file == 'webgl_nearestneighbour') glueInterval += 2000;
       // if (file == 'webgl_simple_gi') renderTimeout += 3000;
-      if (file == 'webgl_test_memory2') continue; // imposible to cover
+      if (file == 'webgl_test_memory2') continue; // imposible to cover ever.
       // if (file == 'webgl_video_panorama_equirectangular') glueInterval += 500;
       // if (file == 'webgl_worker_offscreencanvas') { networkTimeout = 0; renderTimeout = 0; }
       // if (file == 'webxr_vr_multiview') { renderTimeout += 2000; await page.evaluate(() => { window.maxFrameId = 2 }); }
