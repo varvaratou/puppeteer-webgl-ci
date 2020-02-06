@@ -1,4 +1,4 @@
-# puppeteer-three
+# puppeteer-webgl-ci
 [![Travis](https://travis-ci.org/munrocket/puppeteer-three.svg?branch=master)](https://travis-ci.org/munrocket/puppeteer-three)
 [![CircleCI](https://circleci.com/gh/munrocket/puppeteer-three.svg?style=svg)](https://circleci.com/gh/munrocket/puppeteer-three)
 
@@ -20,7 +20,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - [x] procedure that check screenshots
 - [x] try to make robust (hide text, datgui, etc.)
 - [x] ci config with parallelism for travis/circleci
-- [x] pipeline: turn off RAF -> 'networkidle2' -> turn on deterministic RAF -> render promise
+- [x] pipeline: turn off RAF -> 'networkidle0' -> turn on deterministic RAF -> render promise
 
 ### Local usage
 ```shell

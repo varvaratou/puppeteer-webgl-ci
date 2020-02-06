@@ -4,34 +4,38 @@ import express from 'express';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 
-const port = 1234;
-const threshold = 0.2;      // threshold in one pixel
-const totalDiff = 0.05;     // total diff <5% of pixels
-let networkTimeout = 2500;  // puppeteer networkidle2 timeout
-let renderTimeout = 3000;   // promise timeout for render 
-let glueInterval = 100;     // timeout between each step
+const port = 5467;
+const threshold = 0.2;        // threshold in one pixel
+const totalDiff = 0.05;       // total diff <5% of pixels
+let networkTimeout = 3000;    // puppeteer networkidle2 timeout
+let networkInterval = 3000;        // tax timeout for resources
+let minPageSize = 1.1;        // in mb, when tax = 0
+let maxPageSize = 8;          // in mb, when tax = networkInterval
+let renderTimeout = 3000;     // promise timeout for render 
+let renderInterval = 0;       // how often to check render
 let exceptionList = [
-  'misc_controls_deviceorientation',
-  'webgl2_multisampled_renderbuffers',
-  'webgl_kinect',
-  'webgl_loader_draco',
-  'webgl_materials_blending',
-  'webgl_materials_blending_custom',
-  'webgl_materials_car',
-  'webgl_materials_envmaps_hdr',
-  'webgl_materials_envmaps_hdr_nodes',
-  'webgl_materials_envmaps_parallax',
-  'webgl_materials_envmaps_pmrem_nodes',
+  // 'misc_controls_deviceorientation',
+  // 'webgl2_multisampled_renderbuffers',
+  // 'webgl_loader_draco',
+  // 'webgl_materials_blending',
+  // 'webgl_materials_blending_custom',
+  // 'webgl_materials_envmaps_hdr',
+  // 'webgl_materials_envmaps_hdr_nodes',
+  // 'webgl_materials_envmaps_parallax',
+  // 'webgl_materials_envmaps_pmrem_nodes',
   'webgl_test_memory2',     // impossible to cover, ever
-  'webgl_video_panorama_equirectangular',
-  'webgl_worker_offscreencanvas',
-  'webxr_vr_multiview'
+  // 'webgl_video_panorama_equirectangular',
+  // 'webgl_worker_offscreencanvas',
+  // 'webxr_vr_multiview'
 ];
 
 // launch express server
 const app = express();
 app.use(express.static(__dirname + '/../'));
-const server = app.listen(port, async () => pup );
+const server = app.listen(port, async () => {
+  try { await pup } catch (e) { console.error(e) }
+  server.close();
+});
 
 // launch puppeteer with WebGL support in Linux
 let pup = puppeteer.launch({
@@ -39,13 +43,17 @@ let pup = puppeteer.launch({
   args: [ '--use-gl=egl', '--no-sandbox' ]
 }).then(async browser => {
 
-  let page = (await browser.pages())[0];
+  // prepare page
+  let pageSize, page = (await browser.pages())[0];
   await page.setViewport({ width: 800, height: 600 });
   const injection = fs.readFileSync('test/deterministic-injection.js', 'utf8');
   await page.evaluateOnNewDocument(injection);
   page.on('console', msg => (msg.text().slice(0, 6) == 'Render') ? console.log(msg.text()) : {});
   console.redLog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
   console.greenLog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
+  page.on('response', async (response) => {
+    try { await response.buffer().then(buffer => { pageSize += buffer.length}); } catch {}
+  })
 
   // find target files
   const files = fs.readdirSync('./examples')
@@ -62,16 +70,16 @@ let pup = puppeteer.launch({
 
     // load target file
     let file = files[id];
+    pageSize = 0;
     if (exceptionList.includes(file)) continue;
     try {
       await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle0', timeout: networkTimeout });
     } catch (e) {
       console.log('Network timeout exceeded...');
     }
-    await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
 
-    // start rendering
-    await page.evaluate((file) => {
+    // prepare page
+    await page.evaluate(async (file, pageSize, minPageSize, maxPageSize, networkInterval) => {
       let style = document.createElement('style');
       style.type = 'text/css';
       style.innerHTML = `body { font size: 0 !important; }
@@ -85,14 +93,16 @@ let pup = puppeteer.launch({
       if (button) button.click();
       if (file == 'misc_animation_authoring') {
         let divs = document.getElementsByTagName('div')
-        for(let i = 0; i < divs.length; i++) divs[i].style.display = 'none';
-      }
-      window.renderStarted = true;
-    }, file);
-    await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
+        for(let i = 0; i < divs.length; i++) divs[i].style.display ='none';
+      } 
+      let resourcesSize = (pageSize / 1024 / 1024 - minPageSize) / maxPageSize;
+      window.console.log('Render: tax size = ' + resourcesSize);
+      await new Promise((resolve, _) =>setTimeout(resolve, networkInterval * resourcesSize));
+    }, file, pageSize, minPageSize, maxPageSize, networkInterval);
 
-    // wait until rendering
-    await page.evaluate(async (renderTimeout) => {
+    // render promise
+    await page.evaluate(async (renderTimeout, renderInterval) => {
+      window.renderStarted = true;
       await new Promise(function(resolve, _) {
         let renderStart = performance.wow();
         let waitingLoop = setInterval(function() {
@@ -102,10 +112,9 @@ let pup = puppeteer.launch({
             clearInterval(waitingLoop);
             resolve();
           }
-        }, 0);
-      })
-    }, renderTimeout);
-    await new Promise((resolve, _) => setTimeout(resolve, glueInterval));
+        }, 100, renderInterval);
+      });
+    }, renderTimeout, renderInterval);
 
     if (process.env.GENERATE) {
 
@@ -146,12 +155,11 @@ let pup = puppeteer.launch({
     }
   }
 
-  server.close();
   if (failedScreenshot > 0) {
-    console.redLog(`TEST FAILED! ${failedScreenshot} from ${files.length - exceptionList.length} screenshots not pass.`);
-    process.exit(1);
-  } else {
-    console.greenLog(`TEST PASSED! ${files.length - exceptionList.length} screenshots correctly rendered.`);
+    console.redLog(`TEST FAILED! ${failedScreenshot} from ${endId - beginId + 1} screenshots not pass.`);
+    //process.exit(1);
+  } else if (!process.env.FILE) {
+    console.greenLog(`TEST PASSED! ${endId - beginId + 1} screenshots correctly rendered.`);
     await browser.close();
   }
 

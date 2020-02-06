@@ -8,7 +8,6 @@
   };
 
   // deterministic timer
-  let frameId = 0;
   const now = function() { return frameId * 16; };
   window.Date.now = now;
   window.Date.prototype.getTime = now;
@@ -16,6 +15,7 @@
   window.performance.now = now;
 
   // deterministic RAF
+  let frameId = 0;
   window.maxFrameId = 1;
   window.renderStarted = false;
   window.renderFinished = false;
@@ -35,5 +35,7 @@
       });
     }
   }
+
+  //HTMLCanvasElement.prototype.getContext = () => { }
 
 }());
