@@ -50,11 +50,11 @@ const server = app.listen(port, async () => {
       let renderTimeout = 3000;     // render promise timeout
       let checkInterval = 0;
 
-      if (file in [ 'webgl2_multisampled_renderbuffers', 'webgl_loader_draco', 'webgl_loader_draco',
-                    'webgl_materials_blending', 'webgl_materials_blending_custom', 'webgl_materials_car',
-                    'webgl_materials_envmaps_hdr', 'webgl_materials_envmaps_hdr_nodes', 'webgl_materials_envmaps_parallax',
-                    'webgl_materials_envmaps_pmrem_nodes', 'webgl_video_panorama_equirectangular',
-                    'webgl_worker_offscreencanvas', 'webxr_vr_multiview']) continue;
+      if ([ 'webgl2_multisampled_renderbuffers', 'webgl_loader_draco', 'webgl_loader_draco',
+          'webgl_materials_blending', 'webgl_materials_blending_custom', 'webgl_materials_car',
+          'webgl_materials_envmaps_hdr', 'webgl_materials_envmaps_hdr_nodes', 'webgl_materials_envmaps_parallax',
+          'webgl_materials_envmaps_pmrem_nodes', 'webgl_video_panorama_equirectangular',
+          'webgl_worker_offscreencanvas', 'webxr_vr_multiview'].includes(file)) continue;
 
       // attempt to cover manually
       // if (file == 'misc_controls_deviceorientation') { glueInterval += 3000; await page.evaluate(() => { window.maxFrameId = 3 }) }
