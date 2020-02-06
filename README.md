@@ -11,7 +11,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline             |
 | 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | with parallelism         |
 | 12=1+1+7+3 failed, time=4:14            | 9 =1+1+4+3 failed, time=4:26            | with render promise      |
-| passed, time=4:04                       | passed, time=3:59                       | with 13 exceptions       |
+| passed, time=4:04                       | passed, time=3:59                       | with 14 exceptions       |
 
 ### 2do list
 - [x] screenshot maker

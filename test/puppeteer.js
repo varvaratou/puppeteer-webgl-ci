@@ -9,10 +9,11 @@ const threshold = 0.2;      // threshold in one pixel
 const totalDiff = 0.05;     // total diff <5% of pixels
 let networkTimeout = 2500;  // puppeteer networkidle2 timeout
 let renderTimeout = 3000;   // promise timeout for render 
-let glueInterval = 0;       // timeout between each step
+let glueInterval = 100;     // timeout between each step
 let exceptionList = [
   'misc_controls_deviceorientation',
   'webgl2_multisampled_renderbuffers',
+  'webgl_kinect',
   'webgl_loader_draco',
   'webgl_materials_blending',
   'webgl_materials_blending_custom',
