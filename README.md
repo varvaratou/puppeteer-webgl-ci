@@ -11,7 +11,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline             |
 | 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | with parallelism         |
 | 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with render promise      |
-| 6=1+1+2+2 failed, time=4:30             | 5=1+1+2+1 failed, time=3:59             | with network tax         |
+| 6=1+1+2+2 failed, time=4:30             | 5=1+1+2+1 failed, time=4:13             | with network tax         |
 
 ### 2do list
 - [x] screenshot maker
@@ -27,12 +27,14 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 # generate one scrcreenshot
 npx cross-env FILE=<name> npm run ci:gen
 
-# check one file
+# check one example
 npx cross-env FILE=<name> npm run ci
 
-# check all screenshots in browser
-npm run ci:vis
+# generate all scrcreenshots
+npm run ci:gen
 
-# check some part of screenshots
-npx cross-env CI=<0..3> npm run ci
+# check all examples in browser
+npm run ci:vis
 ```
+
+###
