@@ -4,37 +4,30 @@ import express from 'express';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 
-const port = 5467;
+const port = 1234;
 const threshold = 0.2;        // threshold in one pixel
 const totalDiff = 0.05;       // total diff <5% of pixels
-let networkTimeout = 3000;    // puppeteer networkidle2 timeout
-let networkInterval = 3000;        // tax timeout for resources
-let minPageSize = 1.1;        // in mb, when tax = 0
-let maxPageSize = 8;          // in mb, when tax = networkInterval
-let renderTimeout = 3000;     // promise timeout for render 
+let networkTimeout = 600;     // puppeteer networkidle2 timeout
+let networkTax = 3150;        // additional timout tax for resources size
+let minPageSize = 1.0;        // in mb, when networkTax = 0
+let maxPageSize = 5.0;        // in mb, when networkTax = networkTax
+let renderTimeout = 2500;     // promise timeout for render 
 let renderInterval = 0;       // how often to check render
 let exceptionList = [
-  // 'misc_controls_deviceorientation',
-  // 'webgl2_multisampled_renderbuffers',
-  // 'webgl_loader_draco',
-  // 'webgl_materials_blending',
-  // 'webgl_materials_blending_custom',
-  // 'webgl_materials_envmaps_hdr',
-  // 'webgl_materials_envmaps_hdr_nodes',
-  // 'webgl_materials_envmaps_parallax',
-  // 'webgl_materials_envmaps_pmrem_nodes',
-  'webgl_test_memory2',     // impossible to cover, ever
-  // 'webgl_video_panorama_equirectangular',
-  // 'webgl_worker_offscreencanvas',
-  // 'webxr_vr_multiview'
+  //'webgl2_multisampled_renderbuffers',
+  //'webgl_loader_draco',
+  //'webgl_materials_car',
+  //'webgl_materials_envmaps_parallax',
+  //'webgl_video_panorama_equirectangular'
+  'webgl_test_memory2',                   // gives fatal error in puppeteer
+  'webgl_worker_offscreencanvas',         // in a worker, not robust
 ];
 
 // launch express server
 const app = express();
 app.use(express.static(__dirname + '/../'));
 const server = app.listen(port, async () => {
-  try { await pup } catch (e) { console.error(e) }
-  server.close();
+  try { await pup } catch (e) { console.error(e) } finally { server.close() }
 });
 
 // launch puppeteer with WebGL support in Linux
@@ -74,12 +67,10 @@ let pup = puppeteer.launch({
     if (exceptionList.includes(file)) continue;
     try {
       await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle0', timeout: networkTimeout });
-    } catch (e) {
-      console.log('Network timeout exceeded...');
-    }
+    } catch (e) { /*console.log('Network timeout exceeded...');*/}
 
     // prepare page
-    await page.evaluate(async (file, pageSize, minPageSize, maxPageSize, networkInterval) => {
+    await page.evaluate(async (file, pageSize, minPageSize, maxPageSize, networkTax) => {
       let style = document.createElement('style');
       style.type = 'text/css';
       style.innerHTML = `body { font size: 0 !important; }
@@ -96,9 +87,8 @@ let pup = puppeteer.launch({
         for(let i = 0; i < divs.length; i++) divs[i].style.display ='none';
       } 
       let resourcesSize = (pageSize / 1024 / 1024 - minPageSize) / maxPageSize;
-      window.console.log('Render: tax size = ' + resourcesSize);
-      await new Promise((resolve, _) =>setTimeout(resolve, networkInterval * resourcesSize));
-    }, file, pageSize, minPageSize, maxPageSize, networkInterval);
+      await new Promise((resolve, _) => setTimeout(resolve, networkTax * resourcesSize));
+    }, file, pageSize, minPageSize, maxPageSize, networkTax);
 
     // render promise
     await page.evaluate(async (renderTimeout, renderInterval) => {
@@ -112,26 +102,27 @@ let pup = puppeteer.launch({
             clearInterval(waitingLoop);
             resolve();
           }
-        }, 100, renderInterval);
+        }, renderInterval);
       });
     }, renderTimeout, renderInterval);
 
     if (process.env.GENERATE) {
 
       // generate screenshots
-      await page.screenshot({ path: `./test/screenshot-samples/${file}.png`, fullPage: true});
+      await page.screenshot({ path: `./test/screenshot-samples/${file}.png` });
       console.greenLog(`file: ${file} generated`);
 
     } else if (fs.existsSync(`./test/screenshot-samples/${file}.png`)) {
 
       // diff screenshots
-      await page.screenshot({ path: `./node_modules/temp.png`, fullPage: true});
+      await page.screenshot({ path: `./node_modules/temp.png` });
       let img1 = PNG.sync.read(fs.readFileSync(`./test/screenshot-samples/${file}.png`));
       let img2 = PNG.sync.read(fs.readFileSync(`./node_modules/temp.png`));
       let diff = new PNG({ width: img1.width, height: img1.height });
       try {
         pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: threshold });
       } catch(e) {
+        ++failedScreenshot;
         console.redLog(`ERROR! Image sizes does not match in file: ${file}`)
       }
 
@@ -156,10 +147,10 @@ let pup = puppeteer.launch({
   }
 
   if (failedScreenshot > 0) {
-    console.redLog(`TEST FAILED! ${failedScreenshot} from ${endId - beginId + 1} screenshots not pass.`);
-    //process.exit(1);
-  } else if (!process.env.FILE) {
-    console.greenLog(`TEST PASSED! ${endId - beginId + 1} screenshots correctly rendered.`);
+    console.redLog(`TEST FAILED! ${failedScreenshot} from ${endId - beginId} screenshots not pass.`);
+    process.exit(1);
+  } else {
+    console.greenLog(`TEST PASSED! ${endId - beginId} screenshots correctly rendered.`);
     await browser.close();
   }
 
