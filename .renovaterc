@@ -2,6 +2,6 @@
   "automerge": true,
   "automergeType": "branch",
   "bumpVersion": "patch",
-  "schedule": ["on tuesday"],
+  "schedule": ["on sunday"],
   "ignorePaths": [".circleci"]
 }

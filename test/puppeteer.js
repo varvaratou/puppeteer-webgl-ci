@@ -70,17 +70,17 @@ let pup = puppeteer.launch({
 
     // prepare page
     await page.evaluate(async (file, pageSize, minPageSize, maxPageSize, networkTax) => {
+      let button = document.getElementById('startButton');
+      if (button) button.click();
       let style = document.createElement('style');
       style.type = 'text/css';
       style.innerHTML = `body { font size: 0 !important; }
-        #info, button, input, body>div.dg.ac, body>div.lbl { display: none !important; }`;
+                         #info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
       document.getElementsByTagName('head')[0].appendChild(style);
       let canvas = document.getElementsByTagName('canvas');
       for (let i = 0; i < canvas.length; i++) {
         if (canvas[i].height == 48) canvas[i].style.display = 'none';
       }
-      let button = document.getElementById('startButton');
-      if (button) button.click();
       if (file == 'misc_animation_authoring') {
         let divs = document.getElementsByTagName('div')
         for(let i = 0; i < divs.length; i++) divs[i].style.display ='none';
