@@ -14,12 +14,12 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 ### How it works
 - ci configs with parallelism
-- deterministic random/timer/rAF for screenshot
+- deterministic random/timer/rAF/video for screenshot
 - increased robustness with hided text, datgui, etc.
 - pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
 
 ### Status
-98% of 363 examples are covered with tests, 4 example in exception list. Robustness +-1.5% on different machines, because integrated GPU have additional artifacts that not in exception list: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping, webgl_simple_gi.
+98% of 363 examples are covered with tests. Robustness +-2% on different machines, because integrated GPU have additional artifacts that not in exception list: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2.
 
 ### Modification
 Examples that need modification: webgl_performance_nodes button with id=startButton

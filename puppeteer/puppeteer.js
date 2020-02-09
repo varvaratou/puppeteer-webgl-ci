@@ -12,7 +12,7 @@ let networkTax = 3100;        // additional timout tax for resources size
 let minPageSize = 1.0;        // in mb, when networkTax = 0
 let maxPageSize = 5.0;        // in mb, when networkTax = networkTax
 let renderTimeout = 2500;     // promise timeout for render 
-let renderInterval = 100;     // how often to check render
+let renderInterval = 0;     // how often to check render
 let exceptionList = [
   //'webgl_loader_texture_pvrtc'
   //'webgl_materials_car',
@@ -31,10 +31,11 @@ const server = app.listen(port, async () => {
 // launch puppeteer with WebGL support in Linux
 let pup = puppeteer.launch({
   headless: !process.env.VISIBLE,
-  args: [ '--use-gl=egl', '--no-sandbox',
-    '--run-all-compositor-stages-before-draw',
+  args: [
+    '--use-gl=egl', '--no-sandbox',             //4 linux
+    //'--run-all-compositor-stages-before-draw',
     '--enable-surface-synchronization',
-    '--disable-threaded-animation'
+    //'--disable-threaded-animation'
     //,'--disable-checker-imaging',
     //'--disable-image-animation-resync'
   ]
@@ -45,6 +46,7 @@ let pup = puppeteer.launch({
   await page.setViewport({ width: 800, height: 600 });
   const injection = fs.readFileSync('puppeteer/deterministic-injection.js', 'utf8');
   await page.evaluateOnNewDocument(injection);
+  await new Promise(resolve => setTimeout(resolve, 300));
   page.on('console', msg => (msg.text().slice(0, 6) == 'Render') ? console.log(msg.text()) : {});
   console.redLog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
   console.greenLog = function(msg) { console.log(`\x1b[32m${msg}\x1b[37m`)}
@@ -115,7 +117,7 @@ let pup = puppeteer.launch({
       }, renderTimeout, renderInterval);
       
     } catch {
-      console.redLog(`Error! 'Network timeout' is small for your machine. file: ${file}`);
+      console.redLog(`WTF? 'Network timeout' is small for your machine. file: ${file}`);
       continue;
     }
 
