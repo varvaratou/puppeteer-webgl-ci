@@ -33,11 +33,10 @@ let pup = puppeteer.launch({
   headless: !process.env.VISIBLE,
   args: [ '--use-gl=egl', '--no-sandbox',
     '--run-all-compositor-stages-before-draw',
-    '--disable-new-content-rendering-timeout',
     '--enable-surface-synchronization',
-    '--disable-threaded-animation',
-    '--disable-checker-imaging',
-    '--disable-image-animation-resync'
+    '--disable-threaded-animation'
+    //,'--disable-checker-imaging',
+    //'--disable-image-animation-resync'
   ]
 }).then(async browser => {
 
