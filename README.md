@@ -4,14 +4,14 @@
 
 This is not a library but real world exapmle in order to add WebGL automated testing with puppeteer in Three.js.
 
-|           Travis                        |            CircleCI                     |         Attempts         |
-|-----------------------------------------|-----------------------------------------|--------------------------|
-| tiny configs                            | gaint configs                           |                          |
-| 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline             |
-| 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline             |
-| 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | with parallelism         |
-| 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with render promise      |
-| 6=1+1+2+2 failed, time=4:30             | 5=1+1+2+1 failed, time=3:59             | with network tax         |
+|           Travis                        |            CircleCI                     |         Attempts           |
+|-----------------------------------------|-----------------------------------------|----------------------------|
+| tiny configs                            | gaint configs                           |                            |
+| 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline               |
+| 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline               |
+| 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | with parallelism           |
+| 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with render promise        |
+| 5=0+1+2+2 failed, time=3:50             | 4=0+1+1+2 failed, time=4:15             | with network tax           |
 
 ### How it works
 - ci configs with parallelism

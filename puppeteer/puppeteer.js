@@ -33,12 +33,13 @@ const server = app.listen(port, async () => {
 let pup = puppeteer.launch({
   headless: !process.env.VISIBLE,
   args: [ '--use-gl=egl', '--no-sandbox',
-  '--run-all-compositor-stages-before-draw',
-	'--disable-new-content-rendering-timeout',
-	'--enable-features=SurfaceSynchronization',
-	'--disable-threaded-animation',
-	'--disable-checker-imaging',
-	'--disable-image-animation-resync']
+    '--run-all-compositor-stages-before-draw',
+    '--disable-new-content-rendering-timeout',
+    '--enable-surface-synchronization',
+    //'--disable-threaded-animation',
+    //'--disable-checker-imaging',
+    //'--disable-image-animation-resync'
+  ]
 }).then(async browser => {
 
   // prepare page
