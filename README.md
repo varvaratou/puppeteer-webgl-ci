@@ -10,7 +10,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline                         |
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline                         |
 | 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with parallelism and render promise  |
-| 3=0+0+2+1 failed, time=4:24             | 2=0+0+1+1 failed, time=4:15             | with network tax and other stuff     |
+| 3=0+0+2+1 failed, time=5:36             | 2=0+0+1+1 failed, time=4:48             | with network tax and other stuff     |
 
 ### How it works
 - ci configs with parallelism

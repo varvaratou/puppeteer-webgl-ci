@@ -1,8 +1,8 @@
-import puppeteer from 'puppeteer';
-import pixelmatch from 'pixelmatch';
-import express from 'express';
-import fs from 'fs';
-import { PNG } from 'pngjs';
+let puppeteer = require('puppeteer');
+let pixelmatch = require('pixelmatch');
+let express = require('express');
+let fs = require('fs');
+let png = require('pngjs').PNG;
 
 const port = 1234;
 const threshold = 0.2;        // threshold in one pixel
@@ -31,14 +31,7 @@ const server = app.listen(port, async () => {
 // launch puppeteer with WebGL support in Linux
 let pup = puppeteer.launch({
   headless: !process.env.VISIBLE,
-  args: [
-    '--use-gl=egl', '--no-sandbox',             //4 linux
-    //'--run-all-compositor-stages-before-draw',
-    '--enable-surface-synchronization',
-    //'--disable-threaded-animation'
-    //,'--disable-checker-imaging',
-    //'--disable-image-animation-resync'
-  ]
+  args: [ '--use-gl=egl', '--no-sandbox', '--enable-surface-synchronization', '--disble-gpu' ]
 }).then(async browser => {
 
   // prepare page
@@ -131,9 +124,9 @@ let pup = puppeteer.launch({
 
       // diff screenshots
       await page.screenshot({ path: `./node_modules/temp.png` });
-      let img1 = PNG.sync.read(fs.readFileSync(`./examples/screenshots/${file}.png`));
-      let img2 = PNG.sync.read(fs.readFileSync(`./node_modules/temp.png`));
-      let diff = new PNG({ width: img1.width, height: img1.height });
+      let img1 = png.sync.read(fs.readFileSync(`./examples/screenshots/${file}.png`));
+      let img2 = png.sync.read(fs.readFileSync(`./node_modules/temp.png`));
+      let diff = new png({ width: img1.width, height: img1.height });
       try {
         pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: threshold });
       } catch {

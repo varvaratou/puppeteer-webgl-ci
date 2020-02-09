@@ -3,13 +3,12 @@
   "version": "0.0.2",
   "main": "puppeteer.js",
   "scripts": {
-    "ci": "node -r esm --expose-gc ./puppeteer/puppeteer.js",
+    "ci": "node --expose-gc ./puppeteer/puppeteer.js",
     "ci:vis": "cross-env VISIBLE=true npm run ci",
     "ci:gen": "cross-env GENERATE=true npm run ci"
   },
   "devDependencies": {
     "cross-env": "^7.0.0",
-    "esm": "^3.2.25",
     "express": "^4.17.1",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
