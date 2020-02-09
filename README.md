@@ -4,14 +4,13 @@
 
 This is not a library but real world exapmle in order to add WebGL automated testing with puppeteer in Three.js.
 
-|           Travis                        |            CircleCI                     |         Attempts           |
-|-----------------------------------------|-----------------------------------------|----------------------------|
-| tiny configs                            | gaint configs                           |                            |
-| 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline               |
-| 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline               |
-| 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | with parallelism           |
-| 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with render promise        |
-| 4=0+1+2+1 failed, time=3:50             | 3=0+1+1+1 failed, time=4:15             | with network tax           |
+|           Travis                        |            CircleCI                     |               Attempts               |
+|-----------------------------------------|-----------------------------------------|--------------------------------------|
+| tiny configs                            | gaint configs                           |                                      |
+| 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline                         |
+| 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline                         |
+| 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with parallelism and render promise  |
+| 3=0+0+2+1 failed, time=3:50             | 2=0+0+1+1 failed, time=4:15             | with network tax and other stuff     |
 
 ### How it works
 - ci configs with parallelism
@@ -20,7 +19,10 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
 
 ### Status
-98% of 363 examples are covered with tests, last 6 in exception list.
+98% of 363 examples are covered with tests, 4 example in exception list. Robustness +-1.5% on different machines, because integrated GPU have additional artifacts that not in exception list: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping, webgl_simple_gi.
+
+### Modification
+Examples that need modification: webgl_performance_nodes button with id=startButton
 
 ### Local usage
 ```shell

@@ -4,17 +4,17 @@ import express from 'express';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 
-const port = 4645;
+const port = 1234;
 const threshold = 0.2;        // threshold in one pixel
 const totalDiff = 0.05;       // total diff <5% of pixels
-let networkTimeout = 800;     // puppeteer networkidle2 timeout
-let networkTax = 5000;        // additional timout tax for resources size
+let networkTimeout = 1300;    // puppeteer networkidle2 timeout
+let networkTax = 3100;        // additional timout tax for resources size
 let minPageSize = 1.0;        // in mb, when networkTax = 0
 let maxPageSize = 5.0;        // in mb, when networkTax = networkTax
 let renderTimeout = 2500;     // promise timeout for render 
-let renderInterval = 0;       // how often to check render
+let renderInterval = 100;     // how often to check render
 let exceptionList = [
-  //'webgl_loader_draco',
+  //'webgl_loader_texture_pvrtc'
   //'webgl_materials_car',
   //'webgl_materials_envmaps_parallax',
   'webgl_test_memory2',                   // gives fatal error in puppeteer
@@ -72,7 +72,9 @@ let pup = puppeteer.launch({
     if (exceptionList.includes(file)) continue;
     try {
       await page.goto(`http://localhost:${port}/examples/${file}.html`, { waitUntil: 'networkidle0', timeout: networkTimeout });
-    } catch (e) { /*console.log('Network timeout exceeded...');*/}
+    } catch (e) {
+      console.log('Network timeout exceeded...');
+    }
 
     // prepare page
     await page.evaluate(async (file, pageSize, minPageSize, maxPageSize, networkTax) => {
@@ -91,14 +93,14 @@ let pup = puppeteer.launch({
         let divs = document.getElementsByTagName('div')
         for(let i = 0; i < divs.length; i++) divs[i].style.display ='none';
       } 
-      let resourcesSize = (pageSize / 1024 / 1024 - minPageSize) / maxPageSize;
-      await new Promise((resolve, _) => setTimeout(resolve, networkTax * resourcesSize));
+      let resourcesSize = Math.min(1, (pageSize / 1024 / 1024 - minPageSize) / maxPageSize);
+      await new Promise(resolve => setTimeout(resolve, networkTax * resourcesSize));
     }, file, pageSize, minPageSize, maxPageSize, networkTax);
 
     // render promise
     await page.evaluate(async (renderTimeout, renderInterval) => {
       window.renderStarted = true;
-      await new Promise(function(resolve, _) {
+      await new Promise(function(resolve) {
         let renderStart = performance.wow();
         let waitingLoop = setInterval(function() {
           let renderEcceded = (performance.wow() - renderStart > renderTimeout * window.maxFrameId);
@@ -129,6 +131,7 @@ let pup = puppeteer.launch({
       } catch(e) {
         ++failedScreenshot;
         console.redLog(`ERROR! Image sizes does not match in file: ${file}`)
+        continue;
       }
 
       // save and print result
