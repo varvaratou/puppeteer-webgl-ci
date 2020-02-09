@@ -38,7 +38,7 @@ let pup = puppeteer.launch({
   // prepare page
   let pageSize, page = (await browser.pages())[0];
   await page.setViewport({ width: 800, height: 600 });
-  const injection = fs.readFileSync('test/deterministic-injection.js', 'utf8');
+  const injection = fs.readFileSync('puppeteer/deterministic-injection.js', 'utf8');
   await page.evaluateOnNewDocument(injection);
   page.on('console', msg => (msg.text().slice(0, 6) == 'Render') ? console.log(msg.text()) : {});
   console.redLog = function(msg) { console.log(`\x1b[31m${msg}\x1b[37m`)}
@@ -108,14 +108,14 @@ let pup = puppeteer.launch({
     if (process.env.GENERATE) {
 
       // generate screenshots
-      await page.screenshot({ path: `./test/screenshot-samples/${file}.png` });
+      await page.screenshot({ path: `./examples/screenshots/${file}.png` });
       console.greenLog(`file: ${file} generated`);
 
-    } else if (fs.existsSync(`./test/screenshot-samples/${file}.png`)) {
+    } else if (fs.existsSync(`./examples/screenshots/${file}.png`)) {
 
       // diff screenshots
       await page.screenshot({ path: `./node_modules/temp.png` });
-      let img1 = PNG.sync.read(fs.readFileSync(`./test/screenshot-samples/${file}.png`));
+      let img1 = PNG.sync.read(fs.readFileSync(`./examples/screenshots/${file}.png`));
       let img2 = PNG.sync.read(fs.readFileSync(`./node_modules/temp.png`));
       let diff = new PNG({ width: img1.width, height: img1.height });
       try {

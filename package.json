@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "main": "puppeteer.js",
   "scripts": {
-    "ci": "node -r esm ./test/puppeteer.js",
+    "ci": "node -r esm ./puppeteer/puppeteer.js",
     "ci:vis": "cross-env VISIBLE=true npm run ci",
     "ci:gen": "cross-env GENERATE=true npm run ci"
   },
