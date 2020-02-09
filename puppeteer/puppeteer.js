@@ -4,7 +4,7 @@ import express from 'express';
 import fs from 'fs';
 import { PNG } from 'pngjs';
 
-const port = 1234;
+const port = 4645;
 const threshold = 0.2;        // threshold in one pixel
 const totalDiff = 0.05;       // total diff <5% of pixels
 let networkTimeout = 800;     // puppeteer networkidle2 timeout

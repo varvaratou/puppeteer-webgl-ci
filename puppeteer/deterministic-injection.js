@@ -37,6 +37,11 @@
   }
 
   // determitistic video
-  HTMLCanvasElement.prototype.play = () => { }
+  let play = HTMLVideoElement.prototype.play;
+  HTMLVideoElement.prototype.play = async function() {
+    play.call(this);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    this.pause();
+  }
 
 }());
