@@ -14,12 +14,12 @@ let maxPageSize = 5.0;        // in mb, when networkTax = networkTax
 let renderTimeout = 2500;     // promise timeout for render 
 let renderInterval = 0;       // how often to check render
 let exceptionList = [
-  'webgl_loader_draco',
-  'webgl_materials_car',
-  'webgl_materials_envmaps_parallax',
-  'webgl_video_panorama_equirectangular',
+  //'webgl_loader_draco',
+  //'webgl_materials_car',
+  //'webgl_materials_envmaps_parallax',
+  //'webgl_video_panorama_equirectangular',
   'webgl_test_memory2',                   // gives fatal error in puppeteer
-  'webgl_worker_offscreencanvas',         // in a worker, not robust
+  //'webgl_worker_offscreencanvas',         // in a worker, not robust
 ];
 
 // launch express server
@@ -32,7 +32,13 @@ const server = app.listen(port, async () => {
 // launch puppeteer with WebGL support in Linux
 let pup = puppeteer.launch({
   headless: !process.env.VISIBLE,
-  args: [ '--use-gl=egl', '--no-sandbox' ]
+  args: [ '--use-gl=egl', '--no-sandbox',
+  '--run-all-compositor-stages-before-draw',
+	'--disable-new-content-rendering-timeout',
+	'--enable-features=SurfaceSynchronization',
+	'--disable-threaded-animation',
+	'--disable-checker-imaging',
+	'--disable-image-animation-resync']
 }).then(async browser => {
 
   // prepare page
