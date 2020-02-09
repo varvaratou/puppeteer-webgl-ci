@@ -36,6 +36,7 @@
     }
   }
 
-  //HTMLCanvasElement.prototype.getContext = () => { }
+  // determitistic video
+  HTMLCanvasElement.prototype.play = () => { }
 
 }());

@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;        // threshold in one pixel
 const totalDiff = 0.05;       // total diff <5% of pixels
-let networkTimeout = 600;     // puppeteer networkidle2 timeout
+let networkTimeout = 800;     // puppeteer networkidle2 timeout
 let networkTax = 3100;        // additional timout tax for resources size
 let minPageSize = 1.0;        // in mb, when networkTax = 0
 let maxPageSize = 5.0;        // in mb, when networkTax = networkTax
@@ -36,9 +36,9 @@ let pup = puppeteer.launch({
     '--run-all-compositor-stages-before-draw',
     '--disable-new-content-rendering-timeout',
     '--enable-surface-synchronization',
-    //'--disable-threaded-animation',
-    //'--disable-checker-imaging',
-    //'--disable-image-animation-resync'
+    '--disable-threaded-animation',
+    '--disable-checker-imaging',
+    '--disable-image-animation-resync'
   ]
 }).then(async browser => {
 
