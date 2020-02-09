@@ -8,7 +8,7 @@ const port = 4645;
 const threshold = 0.2;        // threshold in one pixel
 const totalDiff = 0.05;       // total diff <5% of pixels
 let networkTimeout = 800;     // puppeteer networkidle2 timeout
-let networkTax = 3100;        // additional timout tax for resources size
+let networkTax = 5000;        // additional timout tax for resources size
 let minPageSize = 1.0;        // in mb, when networkTax = 0
 let maxPageSize = 5.0;        // in mb, when networkTax = networkTax
 let renderTimeout = 2500;     // promise timeout for render 
@@ -17,7 +17,6 @@ let exceptionList = [
   //'webgl_loader_draco',
   //'webgl_materials_car',
   //'webgl_materials_envmaps_parallax',
-  //'webgl_video_panorama_equirectangular',
   'webgl_test_memory2',                   // gives fatal error in puppeteer
   //'webgl_worker_offscreencanvas',         // in a worker, not robust
 ];
@@ -155,9 +154,9 @@ let pup = puppeteer.launch({
   if (failedScreenshot > 0) {
     console.redLog(`TEST FAILED! ${failedScreenshot} from ${endId - beginId} screenshots not pass.`);
     process.exit(1);
-  } else {
+  } else if (!process.env.GENERATE) {
     console.greenLog(`TEST PASSED! ${endId - beginId} screenshots correctly rendered.`);
-    await browser.close();
   }
+  await browser.close();
 
 });

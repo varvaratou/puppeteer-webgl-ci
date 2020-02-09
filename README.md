@@ -11,7 +11,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline               |
 | 19=3+2+7+7 failed, time=6:27            | 18=3+2+7+6 failed, time=6:06            | with parallelism           |
 | 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with render promise        |
-| 5=0+1+2+2 failed, time=3:50             | 4=0+1+1+2 failed, time=4:15             | with network tax           |
+| 4=0+1+2+1 failed, time=3:50             | 3=0+1+1+1 failed, time=4:15             | with network tax           |
 
 ### How it works
 - ci configs with parallelism
