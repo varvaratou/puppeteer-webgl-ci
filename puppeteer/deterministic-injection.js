@@ -39,10 +39,8 @@
   // determitistic video
   let play = HTMLVideoElement.prototype.play;
   HTMLVideoElement.prototype.play = async function() {
+    this.addEventListener('timeupdate', () => this.pause());
     play.call(this);
-    this.addEventListener('metadata', () => {
-      this.pause();
-    });
   }
 
 }());
