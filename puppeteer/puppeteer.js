@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 const port = 1234;
 const threshold = 0.2;        // threshold in one pixel
 const totalDiff = 0.05;       // total diff <5% of pixels
-let networkTimeout = 1300;    // puppeteer networkidle2 timeout
+let networkTimeout = 1200;    // puppeteer networkidle2 timeout
 let networkTax = 3100;        // additional timout tax for resources size
 let minPageSize = 1.0;        // in mb, when networkTax = 0
 let maxPageSize = 5.0;        // in mb, when networkTax = networkTax
@@ -76,42 +76,49 @@ let pup = puppeteer.launch({
       console.log('Network timeout exceeded...');
     }
 
-    // prepare page
-    await page.evaluate(async (file, pageSize, minPageSize, maxPageSize, networkTax) => {
-      let button = document.getElementById('startButton');
-      if (button) button.click();
-      let style = document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = `body { font size: 0 !important; }
-                         #info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
-      document.getElementsByTagName('head')[0].appendChild(style);
-      let canvas = document.getElementsByTagName('canvas');
-      for (let i = 0; i < canvas.length; i++) {
-        if (canvas[i].height == 48) canvas[i].style.display = 'none';
-      }
-      if (file == 'misc_animation_authoring') {
-        let divs = document.getElementsByTagName('div')
-        for(let i = 0; i < divs.length; i++) divs[i].style.display ='none';
-      } 
-      let resourcesSize = Math.min(1, (pageSize / 1024 / 1024 - minPageSize) / maxPageSize);
-      await new Promise(resolve => setTimeout(resolve, networkTax * resourcesSize));
-    }, file, pageSize, minPageSize, maxPageSize, networkTax);
+    try {
 
-    // render promise
-    await page.evaluate(async (renderTimeout, renderInterval) => {
-      window.renderStarted = true;
-      await new Promise(function(resolve) {
-        let renderStart = performance.wow();
-        let waitingLoop = setInterval(function() {
-          let renderEcceded = (performance.wow() - renderStart > renderTimeout * window.maxFrameId);
-          if (window.renderFinished || renderEcceded) {
-            if (renderEcceded) console.log('Render timeout exceeded...');
-            clearInterval(waitingLoop);
-            resolve();
-          }
-        }, renderInterval);
-      });
-    }, renderTimeout, renderInterval);
+      // prepare page
+      await page.evaluate(async (file, pageSize, minPageSize, maxPageSize, networkTax) => {
+        let button = document.getElementById('startButton');
+        if (button) button.click();
+        let style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = `body { font size: 0 !important; }
+                          #info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
+        document.getElementsByTagName('head')[0].appendChild(style);
+        let canvas = document.getElementsByTagName('canvas');
+        for (let i = 0; i < canvas.length; i++) {
+          if (canvas[i].height == 48) canvas[i].style.display = 'none';
+        }
+        if (file == 'misc_animation_authoring') {
+          let divs = document.getElementsByTagName('div')
+          for(let i = 0; i < divs.length; i++) divs[i].style.display ='none';
+        } 
+        let resourcesSize = Math.min(1, (pageSize / 1024 / 1024 - minPageSize) / maxPageSize);
+        await new Promise(resolve => setTimeout(resolve, networkTax * resourcesSize));
+      }, file, pageSize, minPageSize, maxPageSize, networkTax);
+
+      // render promise
+      await page.evaluate(async (renderTimeout, renderInterval) => {
+        window.renderStarted = true;
+        await new Promise(function(resolve) {
+          let renderStart = performance.wow();
+          let waitingLoop = setInterval(function() {
+            let renderEcceded = (performance.wow() - renderStart > renderTimeout * window.maxFrameId);
+            if (window.renderFinished || renderEcceded) {
+              if (renderEcceded) console.log('Render timeout exceeded...');
+              clearInterval(waitingLoop);
+              resolve();
+            }
+          }, renderInterval);
+        });
+      }, renderTimeout, renderInterval);
+      
+    } catch {
+      console.redLog(`Error! 'Network timeout' is small for your machine. file: ${file}`);
+      continue;
+    }
 
     if (process.env.GENERATE) {
 
@@ -128,7 +135,7 @@ let pup = puppeteer.launch({
       let diff = new PNG({ width: img1.width, height: img1.height });
       try {
         pixelmatch(img1.data, img2.data, diff.data, img1.width, img1.height, { threshold: threshold });
-      } catch(e) {
+      } catch {
         ++failedScreenshot;
         console.redLog(`ERROR! Image sizes does not match in file: ${file}`)
         continue;
@@ -152,6 +159,9 @@ let pup = puppeteer.launch({
       ++failedScreenshot;
       console.redLog(`ERROR! Screenshot not exists: ${file}`);
     }
+
+    global.gc();
+    global.gc();
   }
 
   if (failedScreenshot > 0) {
