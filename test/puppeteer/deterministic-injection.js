@@ -70,9 +70,9 @@
 		function renew() {
 			this.load();
 			play.call( this );
-			rAF( renew );
+			RAF( renew );
 		}
-		rAF( renew );
+		RAF( renew );
 
 	}
 

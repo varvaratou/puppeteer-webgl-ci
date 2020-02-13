@@ -11,7 +11,7 @@ const pixelThreshold = 0.2;
 const maxFailedPixels = 0.05;
 let networkTimeout = 1200;
 let networkTax = 4000;                     // additional timout tax for resources size
-let minPageSize = 1.2;                     // in mb, when networkTax = 0
+let minPageSize = 1.0;                     // in mb, when networkTax = 0
 let maxPageSize = 5.0;                     // in mb, when networkTax = networkTax
 let renderTimeout = 2500;
 let exceptionList = [
