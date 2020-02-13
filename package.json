@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "main": "puppeteer.js",
   "scripts": {
-    "ci": "node --expose-gc ./tests/puppeteer/puppeteer.js",
+    "ci": "node --expose-gc ./test/puppeteer/puppeteer.js",
     "ci:vis": "cross-env VISIBLE=true npm run ci",
     "ci:gen": "cross-env GENERATE=true npm run ci"
   },
