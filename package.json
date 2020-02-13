@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.0",
+    "image-output": "^2.4.1",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
     "puppeteer": "^2.1.1",
