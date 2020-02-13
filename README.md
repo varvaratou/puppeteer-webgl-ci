@@ -2,7 +2,7 @@
 [![Travis](https://travis-ci.org/munrocket/puppeteer-three.svg?branch=master)](https://travis-ci.org/munrocket/puppeteer-three)
 [![CircleCI](https://circleci.com/gh/munrocket/puppeteer-three.svg?style=svg)](https://circleci.com/gh/munrocket/puppeteer-three)
 
-This is not a library but real world exapmle in order to add WebGL automated testing with puppeteer in Three.js. Probably it's overcompicated and we can use `HeadlessExperimental.beginFrame`, but who cares if it works.
+This is not a library but real world exapmle in order to add WebGL automated testing with puppeteer in Three.js.
 
 |           Travis                        |            CircleCI                     |               Attempts               |
 |-----------------------------------------|-----------------------------------------|--------------------------------------|
@@ -14,15 +14,12 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 ### How it works
 - ci configs with parallelism
-- deterministic random/timer/rAF/video for screenshot
-- increased robustness with hided text, datgui, etc.
+- deterministic random/timer/rAF/video for screenshots
+- increased robustness with hided text, datgui, different flags and timeouts.
 - pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
 
 ### Status
-98% of 363 examples are covered with tests. Robustness +-2% on different machines, because integrated GPU have additional artifacts that not in exception list: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2.
-
-### Modification
-Examples that need modification: webgl_performance_nodes button with id=startButton
+98% of 363 examples are covered with tests. Robustness +-2% on different machines. For example on integrated GPU additional artifacts in this examples: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2.
 
 ### Local usage
 ```shell
@@ -41,3 +38,9 @@ npm run ci:vis
 # check last half of examples
 npx cross-env CI=23 npm run ci:vis
 ```
+
+### Contribution
+You can help to simplify this script by suggesting example with HeadlessExperimental.beginFrame API
+
+### External modifications
+Examples that need modification: misc_animation_authoring with class .lbl (for example), webgl_performance_nodes button with id=startButton

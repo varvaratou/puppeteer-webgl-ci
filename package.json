@@ -3,18 +3,17 @@
   "version": "0.0.2",
   "main": "puppeteer.js",
   "scripts": {
-    "ci": "node --expose-gc ./puppeteer/puppeteer.js",
+    "ci": "node --expose-gc ./test/puppeteer/puppeteer.js",
     "ci:vis": "cross-env VISIBLE=true npm run ci",
     "ci:gen": "cross-env GENERATE=true npm run ci"
   },
   "devDependencies": {
     "cross-env": "^7.0.0",
-    "express": "^4.17.1",
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
-    "puppeteer": "^2.1.0"
+    "puppeteer": "^2.1.1",
+    "serve": "^11.3.0"
   },
   "author": "munrocket",
-  "license": "MIT",
-  "dependencies": {}
+  "license": "MIT"
 }
