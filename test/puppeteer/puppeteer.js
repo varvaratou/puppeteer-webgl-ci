@@ -2,6 +2,7 @@ let puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
 let pixelmatch = require( 'pixelmatch' );
+let printImage = require( 'image-output' );
 let png = require( 'pngjs' ).PNG;
 let fs = require( 'fs' );
 
@@ -9,15 +10,15 @@ const port = 1234;
 const pixelThreshold = 0.2;
 const maxFailedPixels = 0.05;
 let networkTimeout = 1200;
-let networkTax = 4000;										// additional timout tax for resources size
-let minPageSize = 1.0;										// in mb, when networkTax = 0
-let maxPageSize = 5.0;										// in mb, when networkTax = networkTax
+let networkTax = 4000;                     // additional timout tax for resources size
+let minPageSize = 1.2;                     // in mb, when networkTax = 0
+let maxPageSize = 5.0;                     // in mb, when networkTax = networkTax
 let renderTimeout = 2500;
 let exceptionList = [
-	'webgl_loader_texture_pvrtc',						// not supported in CI, usless
+	'webgl_loader_texture_pvrtc',            // not supported in CI, usless
 	'webgl_materials_envmaps_parallax',
-	'webgl_test_memory2',										// gives fatal error in puppeteer
-	'webgl_worker_offscreencanvas',					// in a worker, not robust
+	'webgl_test_memory2',                    // gives fatal error in puppeteer
+	'webgl_worker_offscreencanvas',          // in a worker, not robust
 ];
 
 console.redLog = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
@@ -70,7 +71,7 @@ const pup = puppeteer.launch( {
 	await page.setViewport( { width: 800, height: 600 } );
 	const injection = fs.readFileSync( 'test/puppeteer/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
-	await new Promise( resolve => setTimeout( resolve, 300 ) );
+	await new Promise( resolve => setTimeout( resolve, 750 ) );
 	page.on( 'console', msg => ( msg.text().slice( 0, 6 ) === 'Render' ) ? console.log( msg.text() ) : {} );
 	page.on( 'response', async ( response ) => {
 
@@ -202,9 +203,7 @@ const pup = puppeteer.launch( {
 
 			/* Make screenshots */
 
-			await page.screenshot( {
-				 path: `./examples/screenshots/${ file }.png`
-			} );
+			await page.screenshot( { path: `./examples/screenshots/${ file }.png` } );
 			console.greenLog( `file: ${ file } generated` );
 
 
@@ -213,16 +212,15 @@ const pup = puppeteer.launch( {
 
 			/* Diff screenshots */
 
-			let screenBuffer = await page.screenshot();
+			let actual = png.sync.read( await page.screenshot() );
 			let expected = png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) );
-			let actual = png.sync.read( screenBuffer );
 			let diff = new png( { width: actual.width, height: actual.height } );
 
-			let currFailedPixels;
+			let numFailedPixels;
 			try {
 
-				currFailedPixels = pixelmatch( expected.data, actual.data, diff.data,
-						actual.width, actual.height, { threshold: pixelThreshold } );
+				numFailedPixels = pixelmatch( expected.data, actual.data, diff.data,
+						actual.width, actual.height, { threshold: pixelThreshold, alpha: 0.2 } );
 
 			} catch {
 
@@ -231,18 +229,19 @@ const pup = puppeteer.launch( {
 				continue;
 
 			}
-			currFailedPixels /= actual.width * actual.height;
+			numFailedPixels /= actual.width * actual.height;
 
 
 			/* Save and print result */
 
-			if ( currFailedPixels < maxFailedPixels ) {
+			if ( numFailedPixels < maxFailedPixels ) {
 
-				console.greenLog( `diff: ${ currFailedPixels.toFixed( 3 ) }, file: ${ file }` );
+				console.greenLog( `diff: ${ numFailedPixels.toFixed( 3 ) }, file: ${ file }` );
 
-				} else {
+			} else {
 
-				console.redLog( `ERROR! Diff wrong in ${ currFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
+				printImage(diff, console);
+				console.redLog( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 				++ failedScreenshot;
 				continue;
 

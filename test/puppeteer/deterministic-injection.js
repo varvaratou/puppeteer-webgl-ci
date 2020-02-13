@@ -1,4 +1,4 @@
-(  function() {
+( function() {
 
 
 	/* Deterministic random */
@@ -15,20 +15,19 @@
 	/* Deterministic timer */
 
 	const now = function() { return frameId * 16; };
-
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
 	window.performance.wow = performance.now;
 	window.performance.now = now;
 
 
-	/* Deterministic rAF */
+	/* Deterministic RAF */
 
 	let frameId = 0;
 	window.chromeMaxFrameId = 1;
 	window.chromeRenderStarted = false;
 	window.chromeRenderFinished = false;
-	const rAF = window.requestAnimationFrame;
+	const RAF = window.requestAnimationFrame;
 	window.requestAnimationFrame = function( cb ) {
 
 		if ( !chromeRenderStarted ) {
@@ -41,7 +40,7 @@
 
 		} else {
 
-			rAF( function() {
+			RAF( function() {
 
 				if ( frameId++ < chromeMaxFrameId ) {
 
