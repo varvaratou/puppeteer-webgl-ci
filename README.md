@@ -6,11 +6,11 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 |           Travis                        |            CircleCI                     |               Attempts               |
 |-----------------------------------------|-----------------------------------------|--------------------------------------|
-| tiny configs                            | gaint configs                           |                                      |
-| 60 from 362 failed, time=21:14          | 54 from 362 failed, time=14:31          | old pipeline                         |
-| 25 from 361 failed, time=16:22          | 22 from 361 failed, time=15:14          | new pipeline                         |
-| 12=1+1+7+3 failed, time=4:26            | 9=1+1+4+3 failed, time=4:14             | with parallelism and render promise  |
-| 3=0+0+2+1 failed, time=5:36             | 2=0+0+1+1 failed, time=4:48             | with network tax and other stuff     |
+| easy configs, slower and less robust    | gaint configs, faster and more robust   |                                      |
+| 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | old pipeline                         |
+| 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                         |
+| 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise  |
+| 4=0+0+2+2 failed, time=5:13             | 3=0+0+1+2 failed, time=5:22             | with network tax and other stuff     |
 
 ### How it works
 - ci configs with parallelism
@@ -41,6 +41,3 @@ npx cross-env CI=23 npm run ci:vis
 
 ### Contribution
 You can help to simplify this script by suggesting example with HeadlessExperimental.beginFrame API
-
-### External modifications
-Examples that need modification: misc_animation_authoring with class .lbl (for example), webgl_performance_nodes button with id=startButton

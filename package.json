@@ -5,7 +5,7 @@
   "scripts": {
     "ci": "node --expose-gc ./test/puppeteer/puppeteer.js",
     "ci:vis": "cross-env VISIBLE=true npm run ci",
-    "ci:gen": "cross-env GENERATE=true npm run ci"
+    "ci:gen": "cross-env MAKE=true npm run ci"
   },
   "devDependencies": {
     "cross-env": "^7.0.0",
