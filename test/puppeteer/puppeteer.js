@@ -66,12 +66,12 @@ const pup = puppeteer.launch( {
 
 	/* Prepare page */
 
+	await new Promise( resolve => setTimeout( resolve, 300 ) );
 	let pageSize;
 	const page = ( await browser.pages() )[ 0 ];
 	await page.setViewport( { width: 800, height: 600 } );
 	const injection = fs.readFileSync( 'test/puppeteer/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
-	await new Promise( resolve => setTimeout( resolve, 750 ) );
 	page.on( 'console', msg => ( msg.text().slice( 0, 6 ) === 'Render' ) ? console.log( msg.text() ) : {} );
 	page.on( 'response', async ( response ) => {
 
@@ -82,13 +82,14 @@ const pup = puppeteer.launch( {
 		} catch { }
 
 	} );
+	await new Promise( resolve => setTimeout( resolve, 300 ) );
 
 
 	/* Find target files */
 
 	const files = fs.readdirSync( './examples' )
 		.filter( f => f.slice( - 5 ) === '.html' && f !== 'index.html' &&
-				( !process.env.FILE || ( process.env.FILE && f === process.env.FILE + '.html' ) ) )
+				( !process.env.FILE || ( process.env.FILE && ( f === process.env.FILE + '.html' || f === process.env.FILE ) ) ) )
 		.map( s => s.slice( 0, s.length - 5 ) );
 
 
