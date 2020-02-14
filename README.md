@@ -6,7 +6,8 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 |           Travis                        |            CircleCI                     |               Attempts               |
 |-----------------------------------------|-----------------------------------------|--------------------------------------|
-| easy configs, slower and less robust    | gaint configs, faster and more robust   |                                      |
+| easy configs, slower and less robust    | gaint configs, faster and more robust   | <--comparison                        |
+| not support colors in terminal          | support colors in terminal              | <--comparison                        |
 | 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | old pipeline                         |
 | 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                         |
 | 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise  |
@@ -19,7 +20,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
 
 ### Status
-98% of 363 examples are covered with tests. Robustness +-2% on different machines. For example on integrated GPU additional artifacts in this examples: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2.
+98% of 363 examples are covered with tests. Robustness +-2% on different machines. For example on integrated GPU additional artifacts in this examples: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2, and in windows os webgl_effects_ascii.
 
 ### Local usage
 ```shell

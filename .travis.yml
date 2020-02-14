@@ -9,4 +9,4 @@ env:
   - CI=3
 
 script:
-  - CI=$CI npm run ci
+  - FORCE_COLOR=0 CI=$CI npm run ci
