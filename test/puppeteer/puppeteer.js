@@ -220,9 +220,12 @@ const pup = puppeteer.launch( {
 			let numFailedPixels;
 			try {
 
-				let isTravis = process.env.FORCE_COLOR === '0';
-				numFailedPixels = pixelmatch( expected.data, actual.data, diff.data, actual.width, actual.height,
-						{ threshold: pixelThreshold, alpha: 0.2, diffMask: isTravis, diffColor: isTravis ? [255, 255, 255] : [255, 0, 0] } );
+				numFailedPixels = pixelmatch( expected.data, actual.data, diff.data, actual.width, actual.height, {
+					threshold: pixelThreshold,
+					alpha: 0.2,
+					diffMask: process.env.FORCE_COLOR === '0',
+					diffColor: process.env.FORCE_COLOR === '0' ? [255, 255, 255] : [255, 0, 0]
+				} );
 
 			} catch {
 
