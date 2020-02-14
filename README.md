@@ -6,8 +6,8 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 |           Travis                        |            CircleCI                     |               Attempts               |
 |-----------------------------------------|-----------------------------------------|--------------------------------------|
-| easy configs, slower and less robust    | gaint configs, faster and more robust   | <--comparison                        |
-| not support colors in terminal          | support colors in terminal              | <--comparison                        |
+| easy configs, slower and less robust    | gaint configs, faster and more robust   |                                      |
+| not support colors in terminal          | support colors in terminal              |                                      |
 | 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | old pipeline                         |
 | 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                         |
 | 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise  |
