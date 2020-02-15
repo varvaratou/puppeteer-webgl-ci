@@ -16,7 +16,7 @@ const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTa
 const renderTimeout = 1200;
 const maxAttemptId = 3;                    // progresseve attempts
 
-let exceptionList = [
+const exceptionList = [
 
 	'index',
 	'webgl_loader_texture_pvrtc',            // not supported in CI, usless
@@ -24,13 +24,11 @@ let exceptionList = [
 	'webgl_test_memory2',                    // gives fatal error in puppeteer
 	'webgl_worker_offscreencanvas',          // in a worker, not robust
 
-].concat(
+].concat( ( process.platform === "win32" ) ? [
 
-	( process.platform === "win32" ) ?
-	[ 'webgl_effects_ascii' ] :              // windows fonts
-	[]
+	'webgl_effects_ascii'                    // windows fonts
 
-);
+] : [] );
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
@@ -102,12 +100,12 @@ const pup = puppeteer.launch( {
 
 	/* Find files */
 
-	const exactList = process.env.FILE ? process.env.FILE.replace( /\.html/g, '' ).split( ',' ).map( f => f.trim() ) : [];
+	const exactList = process.argv.slice(2).map( f => f.replace( '.html', '' ) );
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => process.env.FILE ? exactList.includes( f ) : !exceptionList.includes( f ) );
+		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : !exceptionList.includes( f ) );
 
 
 	/* Loop for each file, with CI parallelism */
@@ -128,15 +126,12 @@ const pup = puppeteer.launch( {
 		while ( attemptId < maxAttemptId ) {
 
 
-			/* Initialization */
+			/* Load target page */
 
 			file = files[ id ];
 			pageSize = 0;
 			global.gc();
 			global.gc();
-
-
-			/* Load target page */
 
 			try {
 
@@ -225,6 +220,7 @@ const pup = puppeteer.launch( {
 				} else {
 
 					console.log( 'Another attempt..' );
+					await new Promise( resolve => setTimeout( resolve, networkTimeout * ( 1 + attemptId ) ) );
 
 				}
 
@@ -273,7 +269,7 @@ const pup = puppeteer.launch( {
 				numFailedPixels /= actual.width * actual.height;
 
 
-				/* Save and print result */
+				/* Print results */
 
 				if ( numFailedPixels < maxFailedPixels ) {
 

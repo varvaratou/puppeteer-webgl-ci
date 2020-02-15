@@ -29,11 +29,11 @@ webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc
 
 ### Local usage
 ```shell
-# generate one scrcreenshot
-npx cross-env FILE=<name,...,nameN> npm run ci:gen
+# generate several scrcreenshots
+npm run ci:gen <example_name> ... <example_name_N>
 
-# check one example
-npx cross-env FILE=<name,...,nameN> npm run ci
+# check several examples
+npm run ci <example_name> ... <example_name_N>
 
 # generate all scrcreenshots
 npm run ci:gen
