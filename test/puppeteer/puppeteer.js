@@ -14,7 +14,7 @@ const networkTax = 2000;                   // additional timout tax for resource
 const minPageSize = 1.0;                   // in mb, when networkTax = 0
 const maxPageSize = 5.0;                   // in mb, when networkTax = networkTax
 const renderTimeout = 2500;
-const maxAttemptId = 4;
+const maxAttemptId = 3;
 const exceptionList = [
 	'index',
 	'webgl_loader_texture_pvrtc',            // not supported in CI, usless

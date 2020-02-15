@@ -12,6 +12,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                         |
 | 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise  |
 | 4=0+0+2+2 failed, time=5:13             | 3=0+0+1+2 failed, time=5:22             | with network tax and other stuff     |
+| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:53             | with progressive attempts            |
 
 ### How it works
 - ci configs with parallelism
@@ -25,10 +26,10 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 ### Local usage
 ```shell
 # generate one scrcreenshot
-npx cross-env FILE=<name> npm run ci:gen
+npx cross-env FILE=< name1,name2 > npm run ci:gen
 
 # check one example
-npx cross-env FILE=<name> npm run ci
+npx cross-env FILE=< name1,name2 > npm run ci
 
 # generate all scrcreenshots
 npm run ci:gen
