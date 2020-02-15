@@ -13,16 +13,24 @@ const networkTimeout = 600;
 const networkTax = 2000;                   // additional timout tax for resources size
 const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
 const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
-const renderTimeout = 1250;
+const renderTimeout = 1200;
 const maxAttemptId = 3;                    // progresseve attempts
 
-const exceptionList = [
+let exceptionList = [
+
 	'index',
 	'webgl_loader_texture_pvrtc',            // not supported in CI, usless
 	'webgl_materials_envmaps_parallax',
 	'webgl_test_memory2',                    // gives fatal error in puppeteer
 	'webgl_worker_offscreencanvas',          // in a worker, not robust
-];
+
+].concat(
+
+	( process.platform === "win32" ) ?
+	[ 'webgl_effects_ascii' ] :              // windows fonts
+	[]
+
+);
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );

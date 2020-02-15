@@ -12,16 +12,20 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                         |
 | 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise  |
 | 4=0+0+2+2 failed, time=5:13             | 3=0+0+1+2 failed, time=5:22             | with network tax and other settings  |
-| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:53             | for robustness: progressive attempts |
+| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:21             | for robustness: progressive attempts |
 
 ### How it works
 - ci configs with parallelism
 - deterministic random/timer/rAF/video for screenshots
 - increased robustness with hided text, datgui, different flags and timeouts.
 - pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
+- added 3 progressive attempts for robustness
 
 ### Status
-98% of 363 examples are covered with tests. Robustness +-3% on different machines. For example on integrated GPU additional artifacts in this examples: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2, and on windows os webgl_effects_ascii.
+98% of 363 examples are covered with tests. Robustness +-3% on different machines. For example in Windows webgl_effects_ascii example fails or on integrated GPU have additional artifacts: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
+
+### Probably wrong screenshots
+webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc
 
 ### Local usage
 ```shell
