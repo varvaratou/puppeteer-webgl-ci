@@ -2,11 +2,17 @@ language: node_js
 node_js: node
 services: xvfb
 
+os:
+  - linux
+  - windows
+
 env:
   - CI=0
   - CI=1
   - CI=2
   - CI=3
 
-script:
-  - FORCE_COLOR=0 CI=$CI npm run ci
+script: FORCE_COLOR=0 CI=$CI npm run ci
+
+allow_fails:
+  - os: windows
