@@ -11,8 +11,8 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | old pipeline                         |
 | 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                         |
 | 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise  |
-| 4=0+0+2+2 failed, time=5:13             | 3=0+0+1+2 failed, time=5:22             | with network tax and other stuff     |
-| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:53             | with progressive attempts            |
+| 4=0+0+2+2 failed, time=5:13             | 3=0+0+1+2 failed, time=5:22             | with network tax and other settings  |
+| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:53             | for robustness: progressive attempts |
 
 ### How it works
 - ci configs with parallelism
@@ -21,15 +21,15 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
 
 ### Status
-98% of 363 examples are covered with tests. Robustness +-2% on different machines. For example on integrated GPU additional artifacts in this examples: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2, and in windows os webgl_effects_ascii.
+98% of 363 examples are covered with tests. Robustness +-3% on different machines. For example on integrated GPU additional artifacts in this examples: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping. Also this screenshots probably wrong: webgl_simple_gi, webgl_postprocessing_dof2, and on windows os webgl_effects_ascii.
 
 ### Local usage
 ```shell
 # generate one scrcreenshot
-npx cross-env FILE=< name1,name2 > npm run ci:gen
+npx cross-env FILE=<name,...,nameN> npm run ci:gen
 
 # check one example
-npx cross-env FILE=< name1,name2 > npm run ci
+npx cross-env FILE=<name,...,nameN> npm run ci
 
 # generate all scrcreenshots
 npm run ci:gen

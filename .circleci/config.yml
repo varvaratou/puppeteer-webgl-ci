@@ -1,7 +1,7 @@
 version: 2
 jobs:
   build:
-  
+
     parallelism: 4
 
     docker:
@@ -27,4 +27,4 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: CI=$CIRCLE_NODE_INDEX npm run ci
+      - run: FORCE_COLOR=0 CI=$CIRCLE_NODE_INDEX npm run ci

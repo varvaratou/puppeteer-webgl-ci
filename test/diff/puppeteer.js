@@ -13,8 +13,9 @@ const networkTimeout = 600;
 const networkTax = 2000;                   // additional timout tax for resources size
 const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
 const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
-const renderTimeout = 2500;
+const renderTimeout = 1250;
 const maxAttemptId = 3;                    // progresseve attempts
+
 const exceptionList = [
 	'index',
 	'webgl_loader_texture_pvrtc',            // not supported in CI, usless
@@ -25,7 +26,7 @@ const exceptionList = [
 
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
-console.warn = ( msg ) => {}; //console.log( msg );
+console.null = ( msg ) => {};
 
 
 /* Launch server */
@@ -75,21 +76,25 @@ const pup = puppeteer.launch( {
 	const injection = fs.readFileSync( 'test/diff/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
-	page.on( 'console', msg => ( msg.text().slice( 0, 6 ) === 'Render' ) ? console.log( msg.text() ) : {} );
+	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
 	page.on( 'response', async ( response ) => {
 
 		try {
 
 			await response.buffer().then( buffer => pageSize += buffer.length );
 
-		} catch { }
+		} catch ( e ) {
+
+			console.null( `Warning. Wrong request. \n${ e }` );
+
+		}
 
 	} );
 
 
 	/* Find files */
 
-	const exactList = process.env.FILE ? process.env.FILE.replace( /\.html/g, '' ).split( ',' ) : [];
+	const exactList = process.env.FILE ? process.env.FILE.replace( /\.html/g, '' ).split( ',' ).map( f => f.trim() ) : [];
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
@@ -108,9 +113,9 @@ const pup = puppeteer.launch( {
 	for ( let id = beginId; id < endId; ++ id ) {
 
 
-		/* At least 3 attempts before fail ( because results not robust ) */
+		/* At least 3 attempts before fail ( for robustness ) */
 
-		let attemptId = 0;
+		let attemptId = process.env.MAKE ? 1 : 0;
 
 		while ( attemptId < maxAttemptId ) {
 
@@ -134,7 +139,7 @@ const pup = puppeteer.launch( {
 
 			} catch {
 
-				console.warn( 'Warning. Network timeout exceeded...' );
+				console.null( 'Warning. Network timeout exceeded...' );
 
 			}
 
@@ -158,6 +163,7 @@ const pup = puppeteer.launch( {
 					style.innerHTML = `body { font size: 0 !important; }
 							#info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
 					document.getElementsByTagName( 'head' )[ 0 ].appendChild( style );
+
 					let canvas = document.getElementsByTagName( 'canvas' );
 					for ( let i = 0; i < canvas.length; ++ i ) {
 
@@ -168,6 +174,7 @@ const pup = puppeteer.launch( {
 						}
 
 					}
+
 					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
 					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * ( 1 + attemptId ) ) );
 
@@ -185,7 +192,7 @@ const pup = puppeteer.launch( {
 
 								if ( renderEcceded ) {
 
-									console.warn( 'Warning. Render timeout exceeded...' );
+									console.log( 'Warning. Render timeout exceeded...' );
 
 								}
 								clearInterval( waitingLoop );
@@ -209,7 +216,7 @@ const pup = puppeteer.launch( {
 
 				} else {
 
-					console.log( 'Warning. Another attempt...' );
+					console.log( 'Another attempt..' );
 
 				}
 
@@ -276,7 +283,7 @@ const pup = puppeteer.launch( {
 
 					} else {
 
-						console.log( 'Warning. Another attempt...' );
+						console.log( 'Another attempt...' );
 
 					}
 
