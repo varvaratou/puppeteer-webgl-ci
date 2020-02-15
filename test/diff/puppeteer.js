@@ -11,10 +11,10 @@ const pixelThreshold = 0.2;
 const maxFailedPixels = 0.05;
 const networkTimeout = 600;
 const networkTax = 2000;                   // additional timout tax for resources size
-const minPageSize = 1.0;                   // in mb, when networkTax = 0
-const maxPageSize = 5.0;                   // in mb, when networkTax = networkTax
+const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
+const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
 const renderTimeout = 2500;
-const maxAttemptId = 3;
+const maxAttemptId = 3;                    // progresseve attempts
 const exceptionList = [
 	'index',
 	'webgl_loader_texture_pvrtc',            // not supported in CI, usless
@@ -72,7 +72,7 @@ const pup = puppeteer.launch( {
 	const page = ( await browser.pages() )[ 0 ];
 	await page.setViewport( { width: 800, height: 600 } );
 
-	const injection = fs.readFileSync( 'test/puppeteer/deterministic-injection.js', 'utf8' );
+	const injection = fs.readFileSync( 'test/diff/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
 
 	page.on( 'console', msg => ( msg.text().slice( 0, 6 ) === 'Render' ) ? console.log( msg.text() ) : {} );
@@ -141,7 +141,7 @@ const pup = puppeteer.launch( {
 
 			try {
 
-				await page.evaluate( async ( pageSize, minPageSize, maxPageSize, networkTax, renderTimeout, attemptId ) => {
+				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptId ) => {
 
 
 					/* Prepare page */
@@ -168,7 +168,7 @@ const pup = puppeteer.launch( {
 						}
 
 					}
-					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - minPageSize ) / maxPageSize );
+					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
 					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * ( 1 + attemptId ) ) );
 
 
@@ -197,7 +197,7 @@ const pup = puppeteer.launch( {
 
 					} );
 
-				}, pageSize, minPageSize, maxPageSize, networkTax, renderTimeout, attemptId );
+				}, pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptId );
 
 			} catch ( e ) {
 
