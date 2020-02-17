@@ -22,9 +22,9 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - added 3 progressive attempts for robustness
 
 ### Status
-97% examples are covered with tests. Random robusness in CI ~85%. Robustness on different machines ~97%. For example in Windows webgl_effects_ascii example always fails or on integrated GPU you will have additional artifacts: webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
+97% examples are covered with tests. Random robusness in CI more than ~93%. Robustness on different machines ~97%. For example in Windows webgl_effects_ascii example always fails or on integrated GPU you will have additional artifacts: webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
 
-### Probably wrong screenshots
+### Probably wrong screenshots (should we add it in exception list?)
 webgl2_multisampled_renderbuffers, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc
 
 ### Local usage
