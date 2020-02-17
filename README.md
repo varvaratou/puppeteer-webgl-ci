@@ -22,10 +22,10 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - added 3 progressive attempts for robustness
 
 ### Status
-98% of 363 examples are covered with tests. Robustness +-3% on different machines. For example in Windows webgl_effects_ascii example fails or on integrated GPU have additional artifacts: webgl2_multisampled_renderbuffers, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
+97% examples are covered with tests. Random robusness in CI ~85%. Robustness on different machines ~97%. For example in Windows webgl_effects_ascii example always fails or on integrated GPU you will have additional artifacts: webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
 
 ### Probably wrong screenshots
-webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc
+webgl2_multisampled_renderbuffers, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc
 
 ### Local usage
 ```shell
@@ -46,4 +46,4 @@ npx cross-env CI=23 npm run ci:vis
 ```
 
 ### Contribution
-You can help to simplify this script by suggesting example with HeadlessExperimental.beginFrame API
+You can help to simplify puppeteer script by suggesting example with [HeadlessExperimental.beginFrame](https://chromedevtools.github.io/devtools-protocol/tot/HeadlessExperimental) CDP API.

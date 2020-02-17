@@ -10,7 +10,7 @@ const port = 1234;
 const pixelThreshold = 0.2;
 const maxFailedPixels = 0.05;
 const networkTimeout = 600;
-const networkTax = 2000;                   // additional timout tax for resources size
+const networkTax = 2000;                   // additional timeout for resources size
 const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
 const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
 const renderTimeout = 1200;
@@ -19,14 +19,14 @@ const maxAttemptId = 3;                    // progresseve attempts
 const exceptionList = [
 
 	'index',
-	'webgl_loader_texture_pvrtc',            // not supported in CI, usless
+	'webgl_loader_texture_pvrtc',            // not supported in CI, useless
 	'webgl_materials_envmaps_parallax',
 	'webgl_test_memory2',                    // gives fatal error in puppeteer
 	'webgl_worker_offscreencanvas',          // in a worker, not robust
 
 ].concat( ( process.platform === "win32" ) ? [
 
-	'webgl_effects_ascii'                    // windows fonts
+	'webgl_effects_ascii'                    // windows fonts not supported
 
 ] : [] );
 
@@ -42,7 +42,6 @@ const server = http.createServer( ( request, response ) => {
 	return handler( request, response );
 
 } );
-
 server.listen( port, async () => {
 
 	try {
@@ -60,6 +59,7 @@ server.listen( port, async () => {
 	}
 
 } );
+server.on( 'SIGINT', () => process.exit( 1 ) );
 
 
 /* Launch puppeteer with WebGL support in Linux */
@@ -119,7 +119,7 @@ const pup = puppeteer.launch( {
 	for ( let id = beginId; id < endId; ++ id ) {
 
 
-		/* At least 3 attempts before fail ( for robustness ) */
+		/* At least 3 attempts before fail */
 
 		let attemptId = process.env.MAKE ? 1 : 0;
 
@@ -306,6 +306,9 @@ const pup = puppeteer.launch( {
 
 	}
 
+
+	/* Finish */
+
 	if ( failedScreenshots ) {
 
 		console.red( `TEST FAILED! ${ failedScreenshots } from ${ endId - beginId } screenshots not pass.` );
@@ -316,7 +319,6 @@ const pup = puppeteer.launch( {
 		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
 
 	}
-
 
 	await browser.close();
 
