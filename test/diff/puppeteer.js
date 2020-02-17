@@ -6,7 +6,7 @@ const printImage = require( 'image-output' );
 const png = require( 'pngjs' ).PNG;
 const fs = require( 'fs' );
 
-console.log('stress test4'.slice(0, 0));
+console.log('stress test 5'.slice(0, 0));
 const port = 1234;
 const pixelThreshold = 0.2;
 const maxFailedPixels = 0.05;
