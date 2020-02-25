@@ -159,12 +159,10 @@
 
 			}
 
-		</script>
-
-		<script>
-			if (navigator.webdriver) { // off pannel for testing
-				setTimeout(() => { document.getElementsByTagName('div')[1].style.display = 'none' }, 500)
+			if (navigator.webdriver) { // off pannel for e2e testing
+				document.getElementsByTagName('div')[1].style.display = 'none';
 			}
+
 		</script>
 
 	</body>

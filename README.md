@@ -1,49 +1,43 @@
-# puppeteer-three
-[![Travis](https://travis-ci.org/munrocket/puppeteer-three.svg?branch=master)](https://travis-ci.org/munrocket/puppeteer-three)
-[![CircleCI](https://circleci.com/gh/munrocket/puppeteer-three.svg?style=svg)](https://circleci.com/gh/munrocket/puppeteer-three)
+# puppeteer-webgl-ci
+[![Travis](https://travis-ci.org/munrocket/puppeteer-webgl-ci.svg?branch=master)](https://travis-ci.org/munrocket/puppeteer-webgl-ci)
+[![CircleCI](https://circleci.com/gh/munrocket/puppeteer-webgl-ci.svg?style=svg)](https://circleci.com/gh/munrocket/puppeteer-webgl-ci)
 
-This is not a library but real world exapmle in order to add WebGL automated testing with puppeteer in Three.js.
+This is not a library but real world exapmle in order to add WebGL automated testing with CI and puppeteer in Three.js.
 
-|           Travis                        |            CircleCI                     |               Attempts               |
-|-----------------------------------------|-----------------------------------------|--------------------------------------|
-| easy configs, slower and less robust    | gaint configs, faster and more robust   |                                      |
-| not support colors in terminal          | support colors in terminal              |                                      |
-| 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | old pipeline                         |
-| 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                         |
-| 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise  |
-| 4=0+0+2+2 failed, time=5:13             | 3=0+0+1+2 failed, time=5:22             | with network tax and other settings  |
-| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:21             | for robustness: progressive attempts |
+|           Travis                        |            CircleCI                     |                Attempts                |
+|-----------------------------------------|-----------------------------------------|----------------------------------------|
+| easy configs, slower and less robust    | gaint configs, faster and more robust   |                                        |
+| 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | old pipeline                           |
+| 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                           |
+| 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise    |
+| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:21             | with size tax and progressive attempts |
+| 1=0+0+1+0 failed, time=4:25             | 1=0+0+1+0 failed, time=4:01             | for simplicity: beginFrame API         |
 
 ### How it works
 - ci configs with parallelism
 - deterministic random/timer/rAF/video for screenshots
-- increased robustness with hided text, datgui, different flags and timeouts.
-- pipeline: turn off rAF -> 'networkidle0' -> networkTax -> turn on rAF -> render promise
-- added 3 progressive attempts for robustness
-
-### Status
-97% examples are covered with tests. Random robusness in CI more than ~93%. Robustness on different machines ~97%. For example in Windows webgl_effects_ascii example always fails or on integrated GPU you will have additional artifacts: webgl_materials_texture_anisotropy, webgl_postprocessing_procedural, webgl_shaders_tonemapping.
-
-### Probably wrong screenshots (should we add it in exception list?)
-webgl2_multisampled_renderbuffers, webgl_simple_gi, webgl_postprocessing_dof2, webgl_loader_texture_pvrtc
+- hided dat.gui, stats.js and text
+- 3 progressive attempts for robustness
+- beginFrame [HeadlessExperimental CDP API](https://chromedevtools.github.io/devtools-protocol/tot/HeadlessExperimental)
+- pipeline: 'load' with loadTimeout -> 1 rAF -> domTimout -> sizeTimeout -> beginFrame
 
 ### Local usage
 ```shell
 # generate several scrcreenshots
-npm run ci:gen <example_name> ... <example_name_N>
+npm run e2e:gen <example_name> ... <example_name_N>
 
 # check several examples
-npm run ci <example_name> ... <example_name_N>
+npm run e2e <example_name> ... <example_name_N>
 
 # generate all scrcreenshots
-npm run ci:gen
-
-# check all examples in browser
-npm run ci:vis
+npm run e2e:gen
 
 # check last half of examples
-npx cross-env CI=23 npm run ci:vis
+npx cross-env CI=23 npm run e2e
 ```
 
-### Contribution
-You can help to simplify puppeteer script by suggesting example with [HeadlessExperimental.beginFrame](https://chromedevtools.github.io/devtools-protocol/tot/HeadlessExperimental) CDP API.
+### Status
+98% examples are covered with tests. Random robusness in CI x%. Robustness on different machines ~97%.
+
+### Wrong screenshots but ok for CI
+webgl_loader_bvh, webgl_loader_texture_pvrtc, webgl_physics_volume

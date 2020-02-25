@@ -10,31 +10,26 @@ const port = 1234;
 const pixelThreshold = 0.2;                // threshold error in one pixel
 const maxFailedPixels = 0.05;              // total failed pixels
 
-const exceptionList = [
+const loadTimeout = 600;
+const domTimeout = 50;
+const sizeTimeout = 1800;                  // additional timeout for resources size
+const minPageSize = 1.0;                   // in mb, when sizeTimeout = 0
+const maxPageSize = 5.0;                   // in mb, when sizeTimeout = sizeTimeout
 
-	'index',
-	'webgl_loader_texture_pvrtc',            // not supported in CI, useless
-	'webgl_materials_envmaps_parallax',
-	'webgl_test_memory2',                    // gives fatal error in puppeteer
-	'webgl_worker_offscreencanvas',          // in a worker, not robust
-
-].concat( ( process.platform === "win32" ) ? [
-
-	'webgl_effects_ascii'                    // windows fonts not supported
-
-] : [] );
-
-const networkTimeout = 600;
-const networkTax = 2000;                   // additional timeout for resources size
-const pageSizeMinTax = 1.0;                // in mb, when networkTax = 0
-const pageSizeMaxTax = 5.0;                // in mb, when networkTax = networkTax
-const renderTimeout = 1200;
 const maxAttemptId = 3;                    // progresseve attempts
 const progressFunc = n => 1 + n;
 
+const exceptionList = [
+	'index',
+	'css3d_youtube',
+	'webgl_materials_envmaps_parallax'
+].concat( ( process.platform === "win32" ) ? [ // for windows
+	'webgl_effects_ascii'
+] : [] );
+
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
-console.null = ( msg ) => {};
+console.null = () => {};
 
 
 /* Launch server */
@@ -64,14 +59,18 @@ server.listen( port, async () => {
 server.on( 'SIGINT', () => process.exit( 1 ) );
 
 
-/* Launch puppeteer with WebGL support in Linux */
+/* Launch puppeteer with WebGL support in Linu x */
 
 const pup = puppeteer.launch( {
-	headless: !process.env.VISIBLE,
 	args: [
 		'--use-gl=egl',
 		'--no-sandbox',
-		'--enable-surface-synchronization'
+		'--enable-begin-frame-control',
+		'--enable-surface-synchronization',
+		'--run-all-compositor-stages-before-draw',
+		'--disable-threaded-animation',
+		'--disable-threaded-scrolling',
+		'--disable-checker-imaging'
 	]
 } ).then( async browser => {
 
@@ -81,8 +80,12 @@ const pup = puppeteer.launch( {
 	const page = ( await browser.pages() )[ 0 ];
 	await page.setViewport( { width: 800, height: 600 } );
 
-	const injection = fs.readFileSync( 'test/diff/deterministic-injection.js', 'utf8' );
+	const preparePage = fs.readFileSync( 'test/e2e/prepare-each-page.js', 'utf8' );
+	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
 	await page.evaluateOnNewDocument( injection );
+
+	const devtools = await page.target().createCDPSession();
+	await devtools.send( 'HeadlessExperimental.enable' );
 
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
 	page.on( 'response', async ( response ) => {
@@ -93,21 +96,23 @@ const pup = puppeteer.launch( {
 
 		} catch ( e ) {
 
-			console.null( `Warning. Wrong request. \n${ e }` );
+			console.null( `Warning. Wrong request. ${ e }` );
 
 		}
 
 	} );
 
+	await new Promise( resolve => setTimeout( resolve, loadTimeout ) );
+
 
 	/* Find files */
 
-	const exactList = process.argv.slice(2).map( f => f.replace( '.html', '' ) );
+	const exactList = process.argv.slice( 2 ).map( f => f.replace( '.html', '' ) );
 
 	const files = fs.readdirSync( './examples' )
 		.filter( s => s.slice( - 5 ) === '.html' )
 		.map( s => s.slice( 0, s.length - 5 ) )
-		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : !exceptionList.includes( f ) );
+		.filter( f => ( process.argv.length > 2 ) ? exactList.includes( f ) : ! exceptionList.includes( f ) );
 
 
 	/* Loop for each file, with CI parallelism */
@@ -132,6 +137,7 @@ const pup = puppeteer.launch( {
 
 			file = files[ id ];
 			attemptProgress = progressFunc( attemptId );
+			await page.goto( 'about:blank' );
 			pageSize = 0;
 			global.gc();
 			global.gc();
@@ -139,8 +145,8 @@ const pup = puppeteer.launch( {
 			try {
 
 				await page.goto( `http://localhost:${ port }/examples/${ file }.html`, {
-					waitUntil: 'networkidle2',
-					timeout: networkTimeout * attemptProgress
+					waitUntil: 'load',
+					timeout: loadTimeout * attemptProgress
 				} );
 
 			} catch {
@@ -150,75 +156,24 @@ const pup = puppeteer.launch( {
 			}
 
 
+			/* Prepare page */
+
 			try {
 
-				await page.evaluate( async ( pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress ) => {
+				await page.evaluate( async ( domTimeout, attemptProgress ) => {
 
+					await new Promise( resolve => setTimeout( resolve, domTimeout * attemptProgress ) );
 
-					/* Prepare page */
+				}, domTimeout, attemptProgress)
 
-					let button = document.getElementById( 'startButton' );
-					if ( button ) {
+				await page.evaluate( preparePage );
 
-						button.click();
+				await page.evaluate( async ( pageSize, minPageSize, maxPageSize, sizeTimeout, attemptProgress ) => {
 
-					}
+					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - minPageSize ) / maxPageSize );
+					await new Promise( resolve => setTimeout( resolve, sizeTimeout * resourcesSize * attemptProgress ) );
 
-					let style = document.createElement( 'style' );
-					style.type = 'text/css';
-					style.innerHTML = `body { font size: 0 !important; }
-							#info, button, input, body > div.dg.ac, body > div.lbl { display: none !important; }`;
-					let head = document.getElementsByTagName( 'head' );
-					if ( head.length > 0 ) {
-
-						head[ 0 ].appendChild( style );
-
-					}
-
-					let canvas = document.getElementsByTagName( 'canvas' );
-					for ( let i = 0; i < canvas.length; ++ i ) {
-
-						if ( canvas[i].height === 48 ) {
-
-							canvas[i].style.display = 'none';
-
-						}
-
-					}
-
-					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - pageSizeMinTax ) / pageSizeMaxTax );
-					await new Promise( resolve => setTimeout( resolve, networkTax * resourcesSize * attemptProgress ) );
-
-
-					/* Resolve render promise */
-
-					window.chromeRenderStarted = true;
-					await new Promise( function( resolve ) {
-
-						if ( typeof performance.wow === 'undefined' ) {
-							performance.wow = performance.now;
-						}
-						let renderStart = performance.wow();
-						let waitingLoop = setInterval( function() {
-
-							let renderEcceded = ( performance.wow() - renderStart > renderTimeout * window.chromeMaxFrameId  * attemptProgress );
-							if ( window.chromeRenderFinished || renderEcceded ) {
-
-								if ( renderEcceded ) {
-
-									console.log( 'Warning. Render timeout exceeded...' );
-
-								}
-								clearInterval( waitingLoop );
-								resolve();
-
-							}
-
-						}, 0 );
-
-					} );
-
-				}, pageSize, pageSizeMinTax, pageSizeMaxTax, networkTax, renderTimeout, attemptProgress );
+				}, pageSize, minPageSize, maxPageSize, sizeTimeout, attemptProgress );
 
 			} catch ( e ) {
 
@@ -231,7 +186,7 @@ const pup = puppeteer.launch( {
 				} else {
 
 					console.log( 'Another attempt..' );
-					await new Promise( resolve => setTimeout( resolve, networkTimeout * attemptProgress ) );
+					await new Promise( resolve => setTimeout( resolve, loadTimeout * attemptProgress ) );
 
 				}
 
@@ -246,7 +201,9 @@ const pup = puppeteer.launch( {
 				/* Make screenshots */
 
 				attemptId = maxAttemptId;
-				await page.screenshot( { path: `./examples/screenshots/${ file }.png` } );
+				let capture = await devtools.send( 'HeadlessExperimental.beginFrame', { screenshot: {} } );
+				fs.writeFileSync( `./examples/screenshots/${ file }.png`, capture.screenshotData, 'base64' );
+
 				console.green( `file: ${ file } generated` );
 
 
@@ -255,7 +212,8 @@ const pup = puppeteer.launch( {
 
 				/* Diff screenshots */
 
-				let actual = png.sync.read( await page.screenshot() );
+				let capture = await devtools.send( 'HeadlessExperimental.beginFrame', { screenshot: {} } );
+				let actual = png.sync.read( Buffer.from( capture.screenshotData, 'base64' ) );
 				let expected = png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) );
 				let diff = new png( { width: actual.width, height: actual.height } );
 
@@ -266,7 +224,7 @@ const pup = puppeteer.launch( {
 						threshold: pixelThreshold,
 						alpha: 0.2,
 						diffMask: process.env.FORCE_COLOR === '0',
-						diffColor: process.env.FORCE_COLOR === '0' ? [255, 255, 255] : [255, 0, 0]
+						diffColor: process.env.FORCE_COLOR === '0' ? [ 255, 255, 255 ] : [ 255, 0, 0 ]
 					} );
 
 				} catch {
@@ -291,7 +249,7 @@ const pup = puppeteer.launch( {
 
 					if ( ++ attemptId === maxAttemptId ) {
 
-						printImage(diff, console);
+						printImage( diff, console );
 						console.red( `ERROR! Diff wrong in ${ numFailedPixels.toFixed( 3 ) } of pixels in file: ${ file }` );
 						++ failedScreenshots;
 						continue;
@@ -325,7 +283,7 @@ const pup = puppeteer.launch( {
 		console.red( `TEST FAILED! ${ failedScreenshots } from ${ endId - beginId } screenshots not pass.` );
 		process.exit( 1 );
 
-	} else if ( !process.env.MAKE ) {
+	} else if ( ! process.env.MAKE ) {
 
 		console.green( `TEST PASSED! ${ endId - beginId } screenshots correctly rendered.` );
 

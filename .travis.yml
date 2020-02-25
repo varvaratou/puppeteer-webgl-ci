@@ -4,7 +4,7 @@ services: xvfb
 
 os:
   - linux
-  - windows
+# - windows
 
 env:
   - CI=0
@@ -12,7 +12,4 @@ env:
   - CI=2
   - CI=3
 
-script: FORCE_COLOR=0 CI=$CI npm run ci
-
-allow_fails:
-  - os: windows
+script: FORCE_COLOR=0 CI=$CI npm run e2e

@@ -3,9 +3,8 @@
   "version": "0.0.2",
   "main": "puppeteer.js",
   "scripts": {
-    "ci": "node --expose-gc ./test/diff/puppeteer.js",
-    "ci:vis": "cross-env VISIBLE=true npm run ci",
-    "ci:gen": "cross-env MAKE=true npm run ci"
+    "e2e": "node --expose-gc ./test/e2e/puppeteer.js",
+    "e2e:gen": "cross-env MAKE=true npm run e2e"
   },
   "devDependencies": {
     "cross-env": "^7.0.0",
@@ -13,7 +12,7 @@
     "pixelmatch": "^5.1.0",
     "pngjs": "^3.4.0",
     "puppeteer": "^2.1.1",
-    "serve": "^11.3.0"
+    "serve-handler": "^6.1.2"
   },
   "author": "munrocket",
   "license": "MIT"

@@ -27,4 +27,4 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: FORCE_COLOR=0 CI=$CIRCLE_NODE_INDEX npm run ci
+      - run: FORCE_COLOR=0 CI=$CIRCLE_NODE_INDEX npm run e2e
