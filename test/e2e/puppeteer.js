@@ -1,3 +1,7 @@
+/**
+ * @author munrocket / https://github.com/munrocket
+ */
+
 const puppeteer = require( 'puppeteer' );
 const handler = require( 'serve-handler' );
 const http = require( 'http' );
@@ -7,32 +11,33 @@ const jimp = require('jimp');
 const fs = require( 'fs' );
 
 const port = 1234;
-const pixelThreshold = 0.2;                // threshold error in one pixel
-const maxFailedPixels = 0.05;              // total failed pixels
+const pixelThreshold = 0.2; // threshold error in one pixel
+const maxFailedPixels = 0.05; // total failed pixels
 
 const width = 800;
 const height = 600;
 const jpgScale = 0.4;
 const jpgQuality = 90;
 
-const loadTimeout = 500;
+const loadTimeout = 600;
 const domTimeout = 50;
-const sizeTimeout = 1800;                  // additional timeout for resources size
-const minPageSize = 1.0;                   // in mb, when sizeTimeout = 0
-const maxPageSize = 6.0;                   // in mb, when sizeTimeout = sizeTimeout
+const sizeTimeout = 2200; // additional timeout for resources size
+const minPageSize = 4.0; // in mb, when sizeTimeout = 0
+const maxPageSize = 28.0; // in mb, when sizeTimeout = sizeTimeout
 
-const maxAttemptId = 3;                    // progresseve attempts
+const maxAttemptId = 3; // progresseve attempts
 const progressFunc = n => 1 + n;
 
 const exceptionList = [
 	'index',
+	'webgl_kinect',
 	'css3d_youtube',
 	'webgl_materials_envmaps_parallax'
-].concat( ( process.platform === "win32" ) ? [ // for windows
+].concat( ( process.platform === "win32" ) ? [ // exceptions for windows
 	'webgl_effects_ascii'
 ] : [] );
 
-console.log('stress test 10');
+const sleep = ( timeout ) => new Promise( resolve => setTimeout( resolve, timeout ) );
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 console.null = () => {};
@@ -65,12 +70,13 @@ server.listen( port, async () => {
 server.on( 'SIGINT', () => process.exit( 1 ) );
 
 
-/* Launch puppeteer with WebGL support in Linu x */
+/* Launch puppeteer with WebGL support in Linux */
 
 const pup = puppeteer.launch( {
 	args: [
 		'--use-gl=egl',
 		'--no-sandbox',
+		'--enable-precise-memory-info',
 		'--enable-begin-frame-control',
 		'--enable-surface-synchronization',
 		'--run-all-compositor-stages-before-draw',
@@ -92,23 +98,9 @@ const pup = puppeteer.launch( {
 
 	const devtools = await page.target().createCDPSession();
 	await devtools.send( 'HeadlessExperimental.enable' );
+	await devtools.send( 'HeapProfiler.enable' );
 
 	page.on( 'console', msg => ( msg.text().slice( 0, 8 ) === 'Warning.' ) ? console.null( msg.text() ) : {} );
-	page.on( 'response', async ( response ) => {
-
-		try {
-
-			await response.buffer().then( buffer => pageSize += buffer.length );
-
-		} catch ( e ) {
-
-			console.null( `Warning. Wrong request. ${ e }` );
-
-		}
-
-	} );
-
-	await new Promise( resolve => setTimeout( resolve, loadTimeout ) );
 
 
 	/* Find files */
@@ -123,11 +115,12 @@ const pup = puppeteer.launch( {
 
 	/* Loop for each file, with CI parallelism */
 
-	let pageSize, file, attemptProgress;
+	let file, attemptProgress;
 	let failedScreenshots = 0;
 	const isParallel = 'CI' in process.env;
 	const beginId = isParallel ? Math.floor( parseInt( process.env.CI.slice( 0, 1 ) ) * files.length / 4 ) : 0;
 	const endId = isParallel ? Math.floor( ( parseInt( process.env.CI.slice( - 1 ) ) + 1 ) * files.length / 4 ) : files.length;
+	await sleep( loadTimeout );
 
 	for ( let id = beginId; id < endId; ++ id ) {
 
@@ -143,7 +136,9 @@ const pup = puppeteer.launch( {
 
 			file = files[ id ];
 			attemptProgress = progressFunc( attemptId );
-			pageSize = 0;
+			await page.goto( 'about:blank' );
+			await devtools.send( 'HeapProfiler.collectGarbage' );
+			await devtools.send( 'HeapProfiler.collectGarbage' );
 			global.gc();
 			global.gc();
 
@@ -156,7 +151,7 @@ const pup = puppeteer.launch( {
 
 			} catch {
 
-				console.log( 'Warning. Network timeout exceeded...' );
+				console.null( 'Warning. Network timeout exceeded...' );
 
 			}
 
@@ -165,21 +160,21 @@ const pup = puppeteer.launch( {
 
 			try {
 
-				await page.evaluate( async ( domTimeout, attemptProgress ) => {
-
-					await new Promise( resolve => setTimeout( resolve, domTimeout * attemptProgress ) );
-
-				}, domTimeout, attemptProgress)
-
+				await page.evaluateHandle( sleep, domTimeout * attemptProgress );
 				await page.evaluate( preparePage );
+				await page.evaluateHandle( sleep, domTimeout * attemptProgress );
 
-				await page.evaluate( async ( pageSize, minPageSize, maxPageSize, sizeTimeout, domTimeout, attemptProgress ) => {
+				async function relativeSize ( page ) {
 
-					await new Promise( resolve => setTimeout( resolve, domTimeout * attemptProgress ) );
-					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - minPageSize ) / maxPageSize );
-					await new Promise( resolve => setTimeout( resolve, sizeTimeout * resourcesSize * attemptProgress ) );
+					const pageSize = await page.evaluate( () => performance.memory.usedJSHeapSize / 1024 / 1024 );
+					return Math.min( 1, ( pageSize - minPageSize ) / maxPageSize );
 
-				}, pageSize, minPageSize, maxPageSize, sizeTimeout, domTimeout, attemptProgress );
+				}
+
+				const size = await relativeSize( page );
+				await page.evaluateHandle( sleep, sizeTimeout * attemptProgress * size );
+				const newSize = await relativeSize( page );
+				await page.evaluateHandle( sleep, sizeTimeout * attemptProgress * ( newSize - size ) );
 
 			} catch ( e ) {
 
@@ -192,7 +187,7 @@ const pup = puppeteer.launch( {
 				} else {
 
 					console.log( 'Another attempt..' );
-					await new Promise( resolve => setTimeout( resolve, loadTimeout * attemptProgress ) );
+					await sleep( loadTimeout * attemptProgress );
 
 				}
 
@@ -208,11 +203,13 @@ const pup = puppeteer.launch( {
 
 				attemptId = maxAttemptId;
 				let capture = await devtools.send( 'HeadlessExperimental.beginFrame', { screenshot: {} } );
-				let img = await jimp.read( Buffer.from( capture.screenshotData, 'base64' ) );
-				img.write( `./examples/screenshots/${ file }.png`)
+				let bitmap = ( await jimp.read( Buffer.from( capture.screenshotData, 'base64' ) ) )
+					.write( `./examples/screenshots/${ file }.png`)
 					.scale( jpgScale ).quality( jpgQuality )
-					.write( `./examples/thumbnails/${ file }.jpg` );
+					.write( `./examples/screenshots/${ file }_thumbnail.jpg` ).bitmap;
+				printImage( bitmap, console );
 				console.green( `file: ${ file } generated` );
+
 
 			} else if ( fs.existsSync( `./examples/screenshots/${ file }.png` ) ) {
 

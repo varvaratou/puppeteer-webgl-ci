@@ -1,6 +1,6 @@
 {
-  "name": "puppeteer-three",
-  "version": "0.0.2",
+  "name": "puppeteer-webgl-ci",
+  "version": "0.1.0",
   "main": "puppeteer.js",
   "scripts": {
     "e2e": "node --expose-gc ./test/e2e/puppeteer.js",

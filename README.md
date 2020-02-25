@@ -36,7 +36,7 @@ npx cross-env CI=23 npm run e2e
 ```
 
 ### Status
-98% examples are covered with tests. Random robusness in CI x%. Robustness on different machines ~97%
+98% examples are covered with tests. Random robusness in CI >90%. Robustness on different machines ~97%
 
 ### Wrong on integrated GPU
 webgl_shaders_tonemapping, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural

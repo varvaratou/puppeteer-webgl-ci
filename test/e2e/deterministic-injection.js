@@ -1,3 +1,7 @@
+/**
+ * @author munrocket / https://github.com/munrocket
+ */
+
 ( function () {
 
 
@@ -14,6 +18,7 @@
 
 	/* Deterministic timer */
 
+	let frameId = 0;
 	const now = () => frameId * 16;
 	window.Date.now = now;
 	window.Date.prototype.getTime = now;
@@ -22,7 +27,6 @@
 
 	/* Deterministic RAF */
 
-	let frameId = 0;
 	const maxFrameId = 2;
 	const RAF = window.requestAnimationFrame;
 	window.requestAnimationFrame = function ( cb ) {
@@ -37,7 +41,7 @@
 
 		} );
 
-	}
+	};
 
 
 	/* Semi-determitistic video */
@@ -57,6 +61,6 @@
 		}
 		RAF( renew );
 
-	}
+	};
 
 }() );

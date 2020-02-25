@@ -1,4 +1,8 @@
-( function () {
+/**
+ * @author munrocket / https://github.com/munrocket
+ */
+
+ ( function () {
 
 
   /* Start VR pages */
