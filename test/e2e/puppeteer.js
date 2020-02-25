@@ -32,7 +32,7 @@ const exceptionList = [
 	'webgl_effects_ascii'
 ] : [] );
 
-//console.log('stress test 3');
+console.log('stress test 2');
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 console.null = () => {};
@@ -143,7 +143,6 @@ const pup = puppeteer.launch( {
 
 			file = files[ id ];
 			attemptProgress = progressFunc( attemptId );
-			await page.goto( 'about:blank' );
 			pageSize = 0;
 			global.gc();
 			global.gc();
