@@ -3,18 +3,23 @@ const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
 const printImage = require( 'image-output' );
-const png = require( 'pngjs' ).PNG;
+const jimp = require('jimp');
 const fs = require( 'fs' );
 
 const port = 1234;
 const pixelThreshold = 0.2;                // threshold error in one pixel
 const maxFailedPixels = 0.05;              // total failed pixels
 
-const loadTimeout = 600;
+const width = 800;
+const height = 600;
+const jpgScale = 0.4;
+const jpgQuality = 90;
+
+const loadTimeout = 500;
 const domTimeout = 50;
 const sizeTimeout = 1800;                  // additional timeout for resources size
 const minPageSize = 1.0;                   // in mb, when sizeTimeout = 0
-const maxPageSize = 5.0;                   // in mb, when sizeTimeout = sizeTimeout
+const maxPageSize = 6.0;                   // in mb, when sizeTimeout = sizeTimeout
 
 const maxAttemptId = 3;                    // progresseve attempts
 const progressFunc = n => 1 + n;
@@ -27,6 +32,7 @@ const exceptionList = [
 	'webgl_effects_ascii'
 ] : [] );
 
+//console.log('stress test 3');
 console.green = ( msg ) => console.log( `\x1b[32m${ msg }\x1b[37m` );
 console.red = ( msg ) => console.log( `\x1b[31m${ msg }\x1b[37m` );
 console.null = () => {};
@@ -78,7 +84,7 @@ const pup = puppeteer.launch( {
 	/* Prepare page */
 
 	const page = ( await browser.pages() )[ 0 ];
-	await page.setViewport( { width: 800, height: 600 } );
+	await page.setViewport( { width, height } );
 
 	const preparePage = fs.readFileSync( 'test/e2e/prepare-each-page.js', 'utf8' );
 	const injection = fs.readFileSync( 'test/e2e/deterministic-injection.js', 'utf8' );
@@ -151,7 +157,7 @@ const pup = puppeteer.launch( {
 
 			} catch {
 
-				console.null( 'Warning. Network timeout exceeded...' );
+				console.log( 'Warning. Network timeout exceeded...' );
 
 			}
 
@@ -168,12 +174,13 @@ const pup = puppeteer.launch( {
 
 				await page.evaluate( preparePage );
 
-				await page.evaluate( async ( pageSize, minPageSize, maxPageSize, sizeTimeout, attemptProgress ) => {
+				await page.evaluate( async ( pageSize, minPageSize, maxPageSize, sizeTimeout, domTimeout, attemptProgress ) => {
 
+					await new Promise( resolve => setTimeout( resolve, domTimeout * attemptProgress ) );
 					let resourcesSize = Math.min( 1, ( pageSize / 1024 / 1024 - minPageSize ) / maxPageSize );
 					await new Promise( resolve => setTimeout( resolve, sizeTimeout * resourcesSize * attemptProgress ) );
 
-				}, pageSize, minPageSize, maxPageSize, sizeTimeout, attemptProgress );
+				}, pageSize, minPageSize, maxPageSize, sizeTimeout, domTimeout, attemptProgress );
 
 			} catch ( e ) {
 
@@ -202,10 +209,11 @@ const pup = puppeteer.launch( {
 
 				attemptId = maxAttemptId;
 				let capture = await devtools.send( 'HeadlessExperimental.beginFrame', { screenshot: {} } );
-				fs.writeFileSync( `./examples/screenshots/${ file }.png`, capture.screenshotData, 'base64' );
-
+				let img = await jimp.read( Buffer.from( capture.screenshotData, 'base64' ) );
+				img.write( `./examples/screenshots/${ file }.png`)
+					.scale( jpgScale ).quality( jpgQuality )
+					.write( `./examples/thumbnails/${ file }.jpg` );
 				console.green( `file: ${ file } generated` );
-
 
 			} else if ( fs.existsSync( `./examples/screenshots/${ file }.png` ) ) {
 
@@ -213,9 +221,9 @@ const pup = puppeteer.launch( {
 				/* Diff screenshots */
 
 				let capture = await devtools.send( 'HeadlessExperimental.beginFrame', { screenshot: {} } );
-				let actual = png.sync.read( Buffer.from( capture.screenshotData, 'base64' ) );
-				let expected = png.sync.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) );
-				let diff = new png( { width: actual.width, height: actual.height } );
+				let actual = ( await jimp.read( Buffer.from( capture.screenshotData, 'base64' ) ) ).bitmap;
+				let expected = ( await jimp.read( fs.readFileSync( `./examples/screenshots/${ file }.png` ) ) ).bitmap;
+				let diff = actual;
 
 				let numFailedPixels;
 				try {

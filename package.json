@@ -4,13 +4,13 @@
   "main": "puppeteer.js",
   "scripts": {
     "e2e": "node --expose-gc ./test/e2e/puppeteer.js",
-    "e2e:gen": "cross-env MAKE=true npm run e2e"
+    "gen": "cross-env MAKE=true npm run e2e"
   },
   "devDependencies": {
     "cross-env": "^7.0.0",
     "image-output": "^2.4.1",
+    "jimp": "^0.9.3",
     "pixelmatch": "^5.1.0",
-    "pngjs": "^3.4.0",
     "puppeteer": "^2.1.1",
     "serve-handler": "^6.1.2"
   },

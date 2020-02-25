@@ -6,7 +6,6 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 
 |           Travis                        |            CircleCI                     |                Attempts                |
 |-----------------------------------------|-----------------------------------------|----------------------------------------|
-| easy configs, slower and less robust    | gaint configs, faster and more robust   |                                        |
 | 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | old pipeline                           |
 | 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | new pipeline                           |
 | 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise    |
@@ -18,26 +17,29 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 - deterministic random/timer/rAF/video for screenshots
 - hided dat.gui, stats.js and text
 - 3 progressive attempts for robustness
-- beginFrame [HeadlessExperimental CDP API](https://chromedevtools.github.io/devtools-protocol/tot/HeadlessExperimental)
+- beginFrame [HeadlessExperimental API](https://chromedevtools.github.io/devtools-protocol/tot/HeadlessExperimental)
 - pipeline: 'load' with loadTimeout -> 1 rAF -> domTimout -> sizeTimeout -> beginFrame
 
 ### Local usage
 ```shell
 # generate several scrcreenshots
-npm run e2e:gen <example_name> ... <example_name_N>
+npm run gen <example_name> ... <example_name_N>
 
 # check several examples
 npm run e2e <example_name> ... <example_name_N>
 
 # generate all scrcreenshots
-npm run e2e:gen
+npm run gen
 
 # check last half of examples
 npx cross-env CI=23 npm run e2e
 ```
 
 ### Status
-98% examples are covered with tests. Random robusness in CI x%. Robustness on different machines ~97%.
+98% examples are covered with tests. Random robusness in CI x%. Robustness on different machines ~97%
+
+### Wrong on integrated GPU
+webgl_shaders_tonemapping, webgl_materials_texture_anisotropy, webgl_postprocessing_procedural
 
 ### Wrong screenshots but ok for CI
 webgl_loader_bvh, webgl_loader_texture_pvrtc, webgl_physics_volume
