@@ -5,7 +5,7 @@
   "scripts": {
     "e2e": "node --expose-gc ./test/e2e/puppeteer.js",
     "gen": "cross-env MAKE=true npm run e2e",
-    "sleep": "echo Waiting for 60 seconds..."
+    "sleep": "echo \"Waiting for 60 seconds...\" && sleep 60"
   },
   "devDependencies": {
     "cross-env": "^7.0.0",

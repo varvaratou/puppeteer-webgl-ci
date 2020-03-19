@@ -12,12 +12,16 @@ jobs:
 
   lint-and-unit:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      - uses: actions/cache@v1
+      - name: Restore cache
+        uses: actions/cache@v1
         env:
           cache-name: cache-node-modules
         with:
@@ -27,13 +31,15 @@ jobs:
             ${{ runner.os }}-ci-${{ env.cache-name }}-
             ${{ runner.os }}-ci-
             ${{ runner.os }}-
+      - name: Install packages
+        run: npm install && sudo apt-get install xvfb
 
-      - run: npm run sleep
+      - name: Some job
+        run: npm run sleep
 
   e2e:
     needs: lint-and-unit
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         CI: [ 0, 1, 2, 3 ]
@@ -41,12 +47,14 @@ jobs:
       CI: ${{ matrix.CI }}
 
     steps:
-
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
         with:
           node-version: '10.x'
-      - uses: actions/cache@v1
+      - name: Restore cache
+        uses: actions/cache@v1
         env:
           cache-name: cache-node-modules
         with:
@@ -56,6 +64,8 @@ jobs:
             ${{ runner.os }}-ci-${{ env.cache-name }}-
             ${{ runner.os }}-ci-
             ${{ runner.os }}-
+      - name: Install packages
+        run: npm install && sudo apt-get install xvfb
 
-      - run: npm install && sudo apt-get install xvfb
-      - run: xvfb-run --auto-servernum npm run e2e
+      - name: End-to-end testing
+        run: xvfb-run --auto-servernum npm run e2e
