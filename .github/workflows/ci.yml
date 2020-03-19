@@ -10,19 +10,8 @@ on:
 
 jobs:
 
-  #lint-and-unit:
-
-  e2e:
-    #needs: lint-and-unit
+  lint-and-unit:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        CI: [ 0, 1, 2, 3 ]
-
-    env:
-      CI: ${{ matrix.CI }}
-
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v1
@@ -33,10 +22,39 @@ jobs:
           cache-name: cache-node-modules
         with:
           path: ~/.npm
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
+            ${{ runner.os }}-ci-${{ env.cache-name }}-
+            ${{ runner.os }}-ci-
+            ${{ runner.os }}-
+
+      - run: npm run sleep
+
+  e2e:
+    needs: lint-and-unit
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        CI: [ 0, 1, 2, 3 ]
+    env:
+      CI: ${{ matrix.CI }}
+
+    steps:
+
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+      - uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ci-${{ env.cache-name }}-
+            ${{ runner.os }}-ci-
             ${{ runner.os }}-
 
       - run: npm install && sudo apt-get install xvfb
