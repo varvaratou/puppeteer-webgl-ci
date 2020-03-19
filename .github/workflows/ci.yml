@@ -1,0 +1,19 @@
+name: CI
+
+on: [ pull_request, push ]
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '10.x'
+
+    - run: npm install
+    - run: sudo apt-get install xvfb
+    - run: xvfb-run --auto-servernum npm run e2e

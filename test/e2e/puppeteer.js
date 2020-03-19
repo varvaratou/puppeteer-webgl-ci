@@ -7,7 +7,7 @@ const handler = require( 'serve-handler' );
 const http = require( 'http' );
 const pixelmatch = require( 'pixelmatch' );
 const printImage = require( 'image-output' );
-const jimp = require('jimp');
+const jimp = require( 'jimp' );
 const fs = require( 'fs' );
 
 const port = 1234;
