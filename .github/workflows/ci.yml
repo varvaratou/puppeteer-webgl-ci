@@ -9,19 +9,35 @@ on:
       - 'docs/**'
 
 jobs:
-  test:
 
+  #lint-and-unit:
+
+  e2e:
+    #needs: lint-and-unit
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        CI: [ 0, 1, 2, 3 ]
+
+    env:
+      CI: ${{ matrix.CI }}
+
     steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+      - uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
 
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v1
-      with:
-        node-version: '10.x'
-
-    - run: npm install
-    - run: sudo apt-get install xvfb
-    - run: xvfb-run --auto-servernum npm run e2e
-      env:
-        CI: 0
+      - run: npm install && sudo apt-get install xvfb
+      - run: xvfb-run --auto-servernum npm run e2e
