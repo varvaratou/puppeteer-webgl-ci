@@ -10,7 +10,7 @@ on:
 
 jobs:
 
-  lint-and-unit:
+  lint:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,19 +32,46 @@ jobs:
             ${{ runner.os }}-ci-
             ${{ runner.os }}-
       - name: Install packages
-        run: npm install && sudo apt-get install xvfb
+        run: npm ci && sudo apt-get install xvfb
 
-      - name: Some job
-        run: npm run sleep
+      - name: === Linting ===
+        run: npm run lint
+
+  unit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+      - name: Install node
+        uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+      - name: Restore cache
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-ci-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ci-${{ env.cache-name }}-
+            ${{ runner.os }}-ci-
+            ${{ runner.os }}-
+      - name: Install packages
+        run: npm ci && sudo apt-get install xvfb
+
+      - name: === Unit testing ===
+        run: npm run unit
 
   e2e:
-    needs: lint-and-unit
     runs-on: ubuntu-latest
     strategy:
       matrix:
         CI: [ 0, 1, 2, 3 ]
     env:
       CI: ${{ matrix.CI }}
+      FORCE_COLOR: 1
 
     steps:
       - name: Git checkout
@@ -65,7 +92,7 @@ jobs:
             ${{ runner.os }}-ci-
             ${{ runner.os }}-
       - name: Install packages
-        run: npm install && sudo apt-get install xvfb
+        run: npm ci && sudo apt-get install xvfb
 
-      - name: End-to-end testing
+      - name: === End-to-end testing ===
         run: xvfb-run --auto-servernum npm run e2e

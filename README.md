@@ -1,4 +1,5 @@
 # puppeteer-webgl-ci
+![CI](https://github.com/munrocket/puppeteer-webgl-ci/workflows/CI/badge.svg)
 [![Travis](https://travis-ci.org/munrocket/puppeteer-webgl-ci.svg?branch=master)](https://travis-ci.org/munrocket/puppeteer-webgl-ci)
 [![CircleCI](https://circleci.com/gh/munrocket/puppeteer-webgl-ci.svg?style=svg)](https://circleci.com/gh/munrocket/puppeteer-webgl-ci)
 
