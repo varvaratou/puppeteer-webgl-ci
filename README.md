@@ -5,13 +5,13 @@
 
 This is not a library but real world exapmle in order to add WebGL automated testing with CI and puppeteer in Three.js.
 
-|           Travis                        |            CircleCI                     |                Attempts                |
-|-----------------------------------------|-----------------------------------------|----------------------------------------|
-| 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          | networkidle0 timeout                   |
-| 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          | with rAF hook                          |
-| 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            | with parallelism and render promise    |
-| 4=0+0+2+2 failed, time=3:26             | 3=0+0+1+2 failed, time=3:21             | with size tax and progressive attempts |
-| 1=0+0+1+0 failed, time=4:25             | 1=0+0+1+0 failed, time=4:01             | for simplicity: beginFrame API         |
+|           Travis                        |            CircleCI                     | Github Actions |                Attempts                |
+|-----------------------------------------|-----------------------------------------|----------------|----------------------------------------|
+| 61 from 362 failed, time=21:14          | 55 from 362 failed, time=14:31          |                | networkidle0 timeout                   |
+| 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          |                | with rAF hook                          |
+| 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            |                | with parallelism and render promise    |
+| 04=0+0+2+2 failed, time=3:26             | 03=0+0+1+2 failed, time=3:21             |                | with size tax and progressive attempts |
+| 01=0+0+1+0 failed, time=4:25             | 01=0+0+1+0 failed, time=4:01             | 01=0+0+1+0 failed, time=??  | for simplicity: beginFrame API         |
 
 ### How it works
 - ci configs with parallelism
