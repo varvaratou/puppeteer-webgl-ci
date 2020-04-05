@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-webgl-ci",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "puppeteer.js",
   "scripts": {
     "e2e": "node --expose-gc ./test/e2e/puppeteer.js",
@@ -11,7 +11,7 @@
   "devDependencies": {
     "cross-env": "^7.0.0",
     "image-output": "^2.4.1",
-    "jimp": "^0.9.3",
+    "jimp": "^0.10.0",
     "pixelmatch": "^5.1.0",
     "puppeteer": "^2.1.1",
     "serve-handler": "^6.1.2"
