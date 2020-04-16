@@ -11,7 +11,7 @@ This is not a library but real world exapmle in order to add WebGL automated tes
 | 26 from 362 failed, time=16:22          | 23 from 362 failed, time=15:14          |                | with rAF hook                          |
 | 13=1+1+7+4 failed, time=4:26            | 10=1+1+4+4 failed, time=4:14            |                | with parallelism and render promise    |
 | 04=0+0+2+2 failed, time=3:26             | 03=0+0+1+2 failed, time=3:21             |                | with size tax and progressive attempts |
-| 01=0+0+1+0 failed, time=4:25             | 01=0+0+1+0 failed, time=4:01             | 01=0+0+1+0 failed, time=??  | for simplicity: beginFrame API         |
+| 01=0+0+1+0 failed, time=4:25             | 01=0+0+1+0 failed, time=4:01             | 01=0+0+1+0 failed, time=4:25  | for simplicity: beginFrame API         |
 
 ### How it works
 - ci configs with parallelism
