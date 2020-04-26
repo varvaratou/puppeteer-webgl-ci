@@ -1,6 +1,6 @@
 {
   "name": "puppeteer-webgl-ci",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "puppeteer.js",
   "scripts": {
     "e2e": "node --expose-gc ./test/e2e/puppeteer.js",
@@ -13,7 +13,7 @@
     "image-output": "^2.4.1",
     "jimp": "^0.10.0",
     "pixelmatch": "^5.1.0",
-    "puppeteer": "^2.1.1",
+    "puppeteer": "^3.0.0",
     "serve-handler": "^6.1.2"
   },
   "author": "munrocket",
